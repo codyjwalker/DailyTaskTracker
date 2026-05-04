@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}ToDo List{% endblock %}
+{% block content %}
+<h2>ToDo List</h2>
+
+<!-- --------------------------------- Add new item --------------------------------- -->
+<form method="post" action="{{ url_for('todo') }}">
+    <input type="hidden" name="action" value="add">
+    <input type="text" name="name" placeholder="New task name" required>
+    <button type="submit">Add</button>
+</form>
+
+<!-- --------------------------------- Pending tasks --------------------------------- -->
+<h3>Pending Tasks</h3>
+{% if pending %}
+<table class="task-table">
+    <thead>
+        <tr><th>Task</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+    {% for item in pending %}
+        <tr>
+            <td>{{ item.name }}</td>
+            <td>
+                <form method="post" action="{{ url_for('todo') }}">
+                    <input type="hidden" name="action" value="complete">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <button type="submit">Complete</button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No pending tasks.</p>
+{% endif %}
+
+<!-- --------------------------------- Completed tasks --------------------------------- -->
+<h3>Completed Tasks</h3>
+{% if completed %}
+<table class="task-table">
+    <thead>
+        <tr><th>Task</th><th>Completed At</th></tr>
+    </thead>
+    <tbody>
+    {% for item in completed %}
+        <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.timestamp }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No completed tasks.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Task Tracker{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <header>
+        <h1>Daily Task Tracker</h1>
+        <nav>
+            <a href="{{ url_for('monthly') }}">Monthly Overview</a>
+			<a href="{{ url_for('todo') }}" class="nav-btn">ToDo List</a>
+        </nav>
+
+        <!-- ──────────────────────────────────────────────────────── -->
+        <!-- Theme switch (same on every page) -->
+        <!-- ──────────────────────────────────────────────────────── -->
+        <div class="theme-switch">
+            <input type="checkbox" id="theme-toggle" aria-label="Toggle light/dark mode">
+            <label for="theme-toggle"></label>
+            <!-- Icon that changes when the theme changes -->
+            <span id="theme-label" aria-hidden="true"></span>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; {{ current_year }} $sudo</p>
+    </footer>
+
+    <!-- ──────────────────────────────────────────────────────── -->
+    <!-- Load the JS that powers the switch -->
+    <!-- ──────────────────────────────────────────────────────── -->
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>
+

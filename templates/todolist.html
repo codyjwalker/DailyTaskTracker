@@ -3,14 +3,61 @@
 {% block content %}
 <h2>ToDo List</h2>
 
-<!-- --------------------------------- Add new item --------------------------------- -->
-<form method="post" action="{{ url_for('todo') }}">
-    <input type="hidden" name="action" value="add">
-    <input type="text" name="name" placeholder="New task name" required>
-    <button type="submit">Add</button>
-</form>
+<!-- =============================  ADD NEW TASK ============================= -->
+<div class="task-form">
+    <form method="post" action="{{ url_for('todo') }}">
+        <input type="hidden" name="action" value="add">
 
-<!-- --------------------------------- Pending tasks --------------------------------- -->
+        <label for="task-name">New task name</label>
+        <input type="text" id="task-name" name="name" placeholder="Enter task" required>
+
+        <label for="due-checkbox">
+            <input type="checkbox" id="due-checkbox" name="due_checkbox">
+            Set a due date
+        </label>
+
+        <div id="due-date-container" style="display:none;">
+            <label for="due-date">Due date/time</label>
+            <input type="datetime-local" id="due-date" name="due_date">
+        </div>
+
+        <button type="submit">Add</button>
+    </form>
+</div>
+
+<!-- =============================  SCHEDULED TASKS ============================= -->
+<h3>Scheduled Tasks</h3>
+{% if scheduled %}
+<table class="task-table">
+    <thead>
+        <tr><th>Task</th><th>Due Date</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+    {% for item in scheduled %}
+        <tr class="{{ item.status_class }}">
+            <td>{{ item.name }}</td>
+            <td>{{ item.due_display }}</td>
+            <td>
+                <form method="post" action="{{ url_for('todo') }}">
+                    <input type="hidden" name="action" value="complete">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <button type="submit">Complete</button>
+                </form>
+                <form method="post" action="{{ url_for('todo') }}" style="display:inline;">
+                    <input type="hidden" name="action" value="remove">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <button type="submit" class="remove">Remove</button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No scheduled tasks.</p>
+{% endif %}
+
+<!-- =============================  PENDING TASKS ============================= -->
 <h3>Pending Tasks</h3>
 {% if pending %}
 <table class="task-table">
@@ -27,6 +74,11 @@
                     <input type="hidden" name="item_id" value="{{ item.id }}">
                     <button type="submit">Complete</button>
                 </form>
+                <form method="post" action="{{ url_for('todo') }}" style="display:inline;">
+                    <input type="hidden" name="action" value="remove">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <button type="submit" class="remove">Remove</button>
+                </form>
             </td>
         </tr>
     {% endfor %}
@@ -36,18 +88,25 @@
 <p>No pending tasks.</p>
 {% endif %}
 
-<!-- --------------------------------- Completed tasks --------------------------------- -->
+<!-- =============================  COMPLETED TASKS ============================= -->
 <h3>Completed Tasks</h3>
 {% if completed %}
 <table class="task-table">
     <thead>
-        <tr><th>Task</th><th>Completed At</th></tr>
+        <tr><th>Task</th><th>Completed At</th><th>Action</th></tr>
     </thead>
     <tbody>
     {% for item in completed %}
         <tr>
             <td>{{ item.name }}</td>
             <td>{{ item.timestamp }}</td>
+            <td>
+                <form method="post" action="{{ url_for('todo') }}" style="display:inline;">
+                    <input type="hidden" name="action" value="remove">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <button type="submit" class="remove">Remove</button>
+                </form>
+            </td>
         </tr>
     {% endfor %}
     </tbody>
@@ -55,4 +114,8 @@
 {% else %}
 <p>No completed tasks.</p>
 {% endif %}
+
+<!-- =============================  JS TOGGLE DUE‑DATE ============================= -->
+<script src="{{ url_for('static', filename='js/todo.js') }}"></script>
 {% endblock %}
+

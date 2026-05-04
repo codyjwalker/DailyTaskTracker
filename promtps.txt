@@ -3,19 +3,26 @@ I am working on a personal Webapp to use as a Daily Task Tracker.  Currently, it
 The file structure for the webapp project is as follows:
 
 personal-task-tracker/
-├── app.py
-├── requirements.txt
-├── tasks.json
-├── README.md
+├── app/
+│   ├── __init__.py
+│   └── routes.py               ← all routes
+├── data/
+│   ├── DailyTasks.json         ← per‑date status map
+│   ├── ToDoList.json           ← custom To‑Do items
+│   └── DailyTasksList.json     ← global task list
 ├── templates/
 │   ├── base.html
 │   ├── daily.html
-│   └── monthly.html
-└── static/
-    └── css/
-        └── style.css
-    └── js/
-        └── theme.js
+│   ├── monthly.html
+│   └── todolist.html
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       └── theme.js
+├── run.py
+├── requirements.txt
+└── README.md
 
 Below is the contents for each of the files above:
 

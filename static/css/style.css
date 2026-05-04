@@ -250,3 +250,21 @@ nav a.nav-btn:hover {
     margin-top: 10px;
 }
 
+/* ------------------------------------------------------------------
+   Colour‑coded scheduled task rows
+------------------------------------------------------------------ */
+.red     { background-color: #f8d7da; }   /* light red */
+.yellow  { background-color: #fff3cd; }   /* light yellow */
+.orange  { background-color: #ffe0b3; }   /* light orange */
+
+/* ------------------------------------------------------------------
+   Remove button styling (so it stands out a bit)
+------------------------------------------------------------------ */
+button.remove {
+    background-color: #dc3545;
+    color: #fff;
+}
+button.remove:hover {
+    background-color: #c82333;
+}
+

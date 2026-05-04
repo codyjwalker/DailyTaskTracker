@@ -195,6 +195,15 @@ def update_daily_status(date_str: str, statuses: dict) -> None:
     data[date_str] = statuses
     save_daily_tasks(data)
 
+# ------------------------------------------------------------------
+# small helper that makes `current_year` available in all
+# templates (used by the footer in base.html)
+# ------------------------------------------------------------------
+@app.context_processor
+def inject_current_year():
+    """Make the current year available in every template."""
+    return {"current_year": datetime.datetime.now().year}
+
 
 # ----------------------------------------------------------------------
 # Routes
@@ -287,25 +296,44 @@ def add_task():
     return redirect(url_for('monthly'))
 
 
+# ------------------------------------------------------------------
+# ------------------------------------------------------------------
+# Updated `/todolist` route – now supports
+#   • “add” with optional due‑date
+#   • “complete” (sets finished‑at timestamp)
+#   • “remove” (delete the item completely)
+#   • colour‑coding of scheduled tasks
+# ------------------------------------------------------------------
 @app.route('/todolist', methods=['GET', 'POST'])
 def todo():
-    """Render the To‑Do list page and handle add/complete actions."""
+    """Render the To‑Do list page and handle add/complete/remove actions."""
     if request.method == 'POST':
         action = request.form.get('action')
+
+        # ----------  Add a new item ----------
         if action == 'add':
             name = request.form.get('name', '').strip()
             if name:
+                # 1. Detect whether the due‑date checkbox was checked
+                due_checkbox = request.form.get('due_checkbox')
+                # 2. Grab the datetime‑local value if supplied
+                raw_due = request.form.get('due_date')
+                # 3. Store as ISO string only if the checkbox was checked
+                due_date = raw_due if due_checkbox == 'on' and raw_due else None
+
                 new_item = {
                     'id': str(uuid.uuid4()),
                     'name': name,
                     'completed': False,
                     'timestamp': None,
+                    'due_date': due_date,   # ← new field
                 }
                 items = load_todo_items()
                 items.append(new_item)
                 save_todo_items(items)
             return redirect(url_for('todo'))
 
+        # ----------  Mark an item as complete ----------
         if action == 'complete':
             item_id = request.form.get('item_id')
             if item_id:
@@ -313,13 +341,59 @@ def todo():
                 for itm in items:
                     if itm['id'] == item_id:
                         itm['completed'] = True
-                        itm['timestamp'] = datetime.datetime.now().isoformat(sep=' ', timespec='seconds')
+                        itm['timestamp'] = datetime.datetime.now().isoformat(
+                            sep=' ', timespec='seconds'
+                        )
                         break
                 save_todo_items(items)
             return redirect(url_for('todo'))
 
-    items = load_todo_items()
-    pending = [i for i in items if not i.get('completed')]
-    completed = [i for i in items if i.get('completed')]
-    return render_template('todolist.html', pending=pending, completed=completed)
+        # ----------  Remove an item ----------
+        if action == 'remove':
+            item_id = request.form.get('item_id')
+            if item_id:
+                items = load_todo_items()
+                items = [itm for itm in items if itm['id'] != item_id]
+                save_todo_items(items)
+            return redirect(url_for('todo'))
 
+    # ----------  GET – build the three lists ----------
+    items = load_todo_items()
+    pending, scheduled, completed = [], [], []
+    now = datetime.datetime.now()
+
+    for itm in items:
+        if itm.get('completed'):
+            completed.append(itm)
+        else:
+            due = itm.get('due_date')
+            if due:                                   # → Scheduled
+                try:
+                    due_dt = datetime.datetime.fromisoformat(due)
+                except ValueError:
+                    due_dt = None
+                if due_dt:
+                    diff = due_dt - now
+                    if diff.total_seconds() < 0:
+                        status = 'red'                # overdue
+                    elif diff <= datetime.timedelta(hours=24):
+                        status = 'orange'             # < 24 h
+                    elif diff <= datetime.timedelta(hours=48):
+                        status = 'yellow'             # 24‑48 h
+                    else:
+                        status = ''                   # > 48 h
+                    itm['status_class'] = status
+                    itm['due_display'] = due_dt.strftime('%Y-%m-%d %H:%M')
+                else:
+                    itm['status_class'] = ''
+                    itm['due_display'] = ''
+                scheduled.append(itm)
+            else:                                      # → Pending
+                pending.append(itm)
+
+    return render_template(
+        'todolist.html',
+        pending=pending,
+        scheduled=scheduled,
+        completed=completed,
+    )

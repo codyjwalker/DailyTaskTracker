@@ -268,3 +268,20 @@ button.remove:hover {
     background-color: #c82333;
 }
 
+/* ── Flash messages ----------------------------------------------- */
+.flashes {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+.flashes li {
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    color: #fff;
+}
+.flashes .success { background-color: #28a745; }
+.flashes .danger  { background-color: #dc3545; }
+.flashes .warning { background-color: #ffc107; }
+.flashes .info    { background-color: #17a2b8; }
+

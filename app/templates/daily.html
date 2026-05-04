@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Daily Overview – {{ date }}{% endblock %}
+{% block content %}
+<h2>Daily Overview – {{ date }}</h2>
+
+<form method="get" action="{{ url_for('main.daily') }}">
+    <label for="date-select">Select date:</label>
+    <input type="date" id="date-select" name="date" value="{{ date }}" onchange="this.form.submit()">
+</form>
+
+<form method="post" action="{{ url_for('main.daily', date=date) }}">
+    <table class="task-table">
+        <!-- CSRF hidden field -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <thead>
+            <tr>
+                <th>Task</th>
+                <th>Completed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>{{ task }}</td>
+                <td>
+                    <input type="checkbox" name="task_{{ loop.index0 }}"
+                           id="task_{{ loop.index0 }}"
+                           {% if statuses[task] %}checked{% endif %}>
+                    <label for="task_{{ loop.index0 }}">
+                        {% if statuses[task] %}Done{% else %}Pending{% endif %}
+                    </label>
+
+
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit">Save</button>
+</form>
+
+<p><a href="{{ url_for('main.monthly') }}">Back to Monthly Overview</a></p>
+
+{% endblock %}
+

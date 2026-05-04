@@ -21,7 +21,7 @@ A lightweight local web application for tracking daily tasks with a monthly over
 
 ```bash
 # Clone the repository or copy the folder structure locally
-cd path/to/personal-task-tracker
+# cd path/to/personal-task-tracker
 
 # (Optional) Create a virtual environment
 python -m venv venv
@@ -35,11 +35,14 @@ python run.py
 
 ```
 
-### Docker
+### Docker Startup
 
 ```bash
-# Startup
 docker compose up --build -d
+```
 
-# Shutdown
+# Docker Shutdown
+
+```bash
 docker compose down
+```

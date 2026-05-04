@@ -1,2 +1,5 @@
 promtps.txt
+prompts.txt
 venv/
+__pycache__/
+*.pyc

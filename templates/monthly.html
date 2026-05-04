@@ -47,4 +47,21 @@
         {% endfor %}
     </tbody>
 </table>
+
+<!-- ── Add Task Form ──── -->
+<div class="task-form">
+    <h3>Add a new task</h3>
+    <form method="post" action="{{ url_for('add_task') }}">
+        <label>
+            Task name:
+            <input type="text" name="name" required>
+        </label>
+        <label>
+            Position (row number):
+            <input type="number" name="position" min="1" step="1">
+        </label>
+        <button type="submit">Add Task</button>
+    </form>
+</div>
+
 {% endblock %}

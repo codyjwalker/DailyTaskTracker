@@ -2,4 +2,5 @@ promtps.txt
 prompts.txt
 venv/
 __pycache__/
+./app/__pycache__/*
 *.pyc

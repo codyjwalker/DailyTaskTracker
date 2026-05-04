@@ -32,3 +32,14 @@ pip install -r requirements.txt
 
 # Running the server
 python run.py
+
+```\bash
+
+### Docker
+
+```bash
+# Startup
+docker compose up --build -d
+
+# Shutdown
+docker compose down

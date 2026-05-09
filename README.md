@@ -1,36 +1,39 @@
 # Personal Task Tracker
 
-A lightweight local web application for tracking daily tasks with a monthly overview.
+A lightweight local web application for tracking daily tasks with a monthly overview, a dedicated To‑Do list, and a light/dark theme toggle.
 
 ## Features
 
 - **Daily Overview** – View and toggle tasks for any chosen day.
-- **Monthly Overview** – See a calendar grid with completion status for each task per day.
-- **ToDo List** – See a list of specific tasks that aren't dailies and track progress on completing them.
-- **Local Server** – Host on your local network so any device on the same LAN can view the site.
-- **Persistent Storage** – Tasks are saved in a JSON file (`tasks.json`) and ToDo List items in JSON file (`todolist.json`).
+- **Monthly Overview** – Calendar grid with completion status for each task per day.
+- **To‑Do List** – Schedule items, see upcoming due dates, and mark them completed.
+- **User Accounts** – Login / register with secure password hashing.
+- **Light/Dark Theme** – Persisted with `localStorage` and can be switched from any page.
+- **Secure** – CSRF protection, password hashing, session‑based authentication.
 
-## Setup
-
-### Prerequisites
-
-- Python 3.8+ (or any recent Python 3.x)
-- `pip` (Python package installer)
-
-### Installation
+## Quick Start
 
 ```bash
+<<<<<<< HEAD
 # Clone the repository or copy the folder structure locally
 # cd path/to/personal-task-tracker
+=======
+# Clone the repo
+git clone <repo-url>
+cd personal-task-tracker
+>>>>>>> 8b13346 (Clean up & optimize code, rename & reorganize file structure, extract helpers into common file, remove duplication.)
 
-# (Optional) Create a virtual environment
+# Optional: create a virtual environment
 python -m venv venv
-source venv/bin/activate   # On Windows: venv\Scripts\activate
+source venv/bin/activate   # Windows: venv\Scripts\activate
 
-# Install dependencies
+# Install deps
 pip install -r requirements.txt
 
-# Running the server
+# Create a secret key (one line, no quotes)
+echo 'YOUR_RANDOM_KEY' > secret_key.txt
+
+# Run locally
 python run.py
 
 ```

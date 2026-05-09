@@ -1,17 +1,21 @@
-I am working on a personal Webapp to use as a Daily Task Tracker.  Currently, it has a daily overview of tasks that should be done every day to keep track of the status of each task, and a monthly view of all the tasks for every day for the month.  This all works nicely because every day there are the exact same tasks to do.  I want to add some more functionality to this.  Basically, I want to add new functionality for customs tasks for the User to input themselves onto a totally separate page containing a totally separate list, and to be able to track when they have completed them.  I want to add a totally new page that is accessable from both the Daily Views and the Monthly Views.  This new page should be called the "ToDo List", so both the daily views and monthly views should have a button added towards the top that says "ToDo List" that navigates the user to this new page when clicked.  The ToDo List shall be a totally separate list of items from the daily tasks.  Initially, it shall start out empty.  The top of the ToDo list shall have a button to add a new item to the ToDo List.  Upon clicking the button, the User shall be prompted to enter in a name for the new ToDo List Item they are creating.  There should also be an "Add" button that appears next to the text entry for the User input so that the User can click it when they are done entering the ToDo list item.  Upon clicking the OK button, the new ToDo List Item shall be added to the ToDo List Page.  All items on the ToDo List Page shall contain a button that is labeled "Complete".  Upon clicking the "Complete" button, the ToDo List Item shall be moved to a separate list on the bottom of the ToDo List page that is labelled "Completed Items".  When it is added to this list, the item shall contain the original name entered by the User when they put it onto the ToDo List, and it shall have the date and time of when the User clicked the "Complete" button to complete the item.  I want the end result to look clean and professional, to support and be consistent with the light / dark mode theming that the other pages support, and to be cleverly designed.
+I am working on a personal Webapp to use as a Daily Task Tracker.  Currently, it has a daily overview of tasks that should be done every day to keep track of the status of each task. This dialy view looks good, but I think it would be easier to read if it weren't so wide.  On mobile the width seems fine, but on desktop, the table takes up the entire width of the display, even though it is only 2 columns wide.  I would like to enforce a sort of maximum width on the table so that it is easier to associate the elements of a row together.
 
 The file structure for the webapp project is as follows:
 
 personal-task-tracker/
 ├── app/
-│   ├── __init__.py
-│   └── routes.py               ← all routes
+│   ├── __init__.py          ← Flask app & secret key
+│   └── routes.py            ← All routing logic (login, register, logout, views)
 ├── data/
-│   ├── DailyTasks.json         ← per‑date status map
-│   ├── ToDoList.json           ← custom To‑Do items
-│   └── DailyTasksList.json     ← global task list
+│   ├── users.json           ← Maps username → password hash
+│   └── users/
+│       └── <username>/      ← Per‑user JSON files
+│           ├── DailyTasks.json
+│           ├── ToDoList.json
+│           └── DailyTasksList.json
 ├── templates/
 │   ├── base.html
+│   ├── login.html
 │   ├── daily.html
 │   ├── monthly.html
 │   └── todolist.html
@@ -19,218 +23,43 @@ personal-task-tracker/
 │   ├── css/
 │   │   └── style.css
 │   └── js/
-│       └── theme.js
+│       ├── theme.js
+│       └── todo.js      ← (kept for future use, no changes)
 ├── run.py
 ├── requirements.txt
 └── README.md
 
-Below is the contents for each of the files above:
+
+Below is the contents for the relevent files above:
 
 
 
-FILE: app.py
+FILE: run.py
 
-#!/usr/bin/env python3
+# run.py
 """
-Simple Flask application for tracking daily tasks.
-Author: [Your Name]
+Entry point for the Personal Task Tracker.
 """
 
-import os
-import json
-import datetime
-from flask import Flask, render_template, request, redirect, url_for
+from app import create_app
 
-app = Flask(__name__)
-
-# Path to the JSON file storing task statuses
-DATA_FILE = 'tasks.json'
-
-# The fixed list of tasks for each day
-TASKS = [
-      'Wake Up By 8:30',
-      'Log Weight',
-      'Make Bed',
-      'Morning Mantra',
-      'Meditate',
-      'Morning Sun',
-      'Stretch',
-      'Check Email',
-      'Morning Hygine',
-      'Vitamins/Creatine',
-      'Workout Regime',
-      'Feed & Take Out Sharron',
-      'Work Goals',
-      'Tidy Up',
-      'ToDo (~30min)',
-      'Music Production Goals',
-      'Protein Shake',
-      'Count Macros',
-      'Meet Macros',
-      'Close Rings',
-      'Nighttime Hygine',
-      'Nighttime Stretch',
-      'Bed By Midnight'
-]
-
-def get_previous_month(year: int, month: int) -> tuple[int, int]:
-    """Return (prev_year, prev_month)."""
-    return (year - 1, 12) if month == 1 else (year, month - 1)
-
-def get_next_month(year: int, month: int) -> tuple[int, int]:
-    """Return (next_year, next_month)."""
-    return (year + 1, 1) if month == 12 else (year, month + 1)
-
-def load_data():
-    """Load the tasks data from the JSON file."""
-    if not os.path.exists(DATA_FILE):
-        # Create an empty file if it doesn't exist
-        with open(DATA_FILE, 'w') as f:
-            json.dump({}, f)
-        return {}
-    with open(DATA_FILE, 'r') as f:
-        try:
-            data = json.load(f)
-            # Ensure keys are strings
-            return {str(k): v for k, v in data.items()}
-        except json.JSONDecodeError:
-            # Corrupted file, reset
-            return {}
-
-def save_data(data):
-    """Save the tasks data to the JSON file."""
-    with open(DATA_FILE, 'w') as f:
-        json.dump(data, f, indent=4)
-
-def get_date_data(date_str):
-    """Get the tasks dictionary for a specific date string (YYYY-MM-DD).
-    If the date does not exist, initialize with all tasks set to False.
-    """
-    data = load_data()
-    if date_str not in data:
-        # Initialize
-        data[date_str] = {task: False for task in TASKS}
-        save_data(data)
-    return data[date_str]
-
-def update_date_data(date_str, statuses):
-    """Update the tasks statuses for a given date string.
-    `statuses` is a dict mapping task names to bool.
-    """
-    data = load_data()
-    data[date_str] = statuses
-    save_data(data)
-
-def generate_month_view(year, month):
-    """Generate data for rendering the monthly overview.
-    Returns a list of days with date strings, weekday, and task statuses.
-    """
-    # First day of month
-    first_day = datetime.date(year, month, 1)
-    # Last day
-    if month == 12:
-        last_day = datetime.date(year, month, 31)
-    else:
-        last_day = datetime.date(year, month + 1, 1) - datetime.timedelta(days=1)
-    num_days = last_day.day
-
-    data = load_data()
-    days = []
-    for day in range(1, num_days + 1):
-        date_obj = datetime.date(year, month, day)
-        date_str = date_obj.isoformat()
-        # Ensure data exists
-        if date_str not in data:
-            data[date_str] = {task: False for task in TASKS}
-        day_info = {
-            'date': date_str,
-            'day': day,
-            'weekday': date_obj.strftime('%a'),
-            'statuses': data[date_str]
-        }
-        days.append(day_info)
-    # Persist any new dates
-    save_data(data)
-    return days
-
-@app.context_processor
-def inject_now():
-    """Provide the current year to templates for the footer."""
-    return {'current_year': datetime.datetime.utcnow().year}
-
-@app.route('/')
-@app.route('/monthly')
-def monthly():
-    """Render the monthly view for an arbitrary month/year."""
-    """If no `year`/`month` is supplied the current month is used."""
-
-    """ Resolve the requested month & year """
-    today = datetime.date.today()
-    month = int(request.args.get('month', today.month))
-    year  = int(request.args.get('year', today.year))
-
-    """ Build the calendar and calculate prev/next """
-    days = generate_month_view(year, month)
-
-    prev_year, prev_month = get_previous_month(year, month)
-    next_year, next_month = get_next_month(year, month)
-
-    """ Render """
-    return render_template(
-        'monthly.html',
-        year=year,
-        month=month,
-        month_name=datetime.date(year, month, 1).strftime('%B'),
-        days=days,
-        tasks=TASKS,
-        # The four values below are used by the navigation links
-        prev_year=prev_year, prev_month=prev_month,
-        next_year=next_year, next_month=next_month
-    )
-
-
-@app.route('/daily', methods=['GET', 'POST'])
-def daily():
-    """Render and handle the daily overview page."""
-    # Determine date: from query param or today's date
-    date_str = request.args.get('date')
-    if not date_str:
-        date_str = datetime.date.today().isoformat()
-
-    # Validate date format
-    try:
-        date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
-    except ValueError:
-        # Invalid date, redirect to monthly
-        return redirect(url_for('monthly'))
-
-    if request.method == 'POST':
-        # Process form submission
-        statuses = {}
-        for idx, task in enumerate(TASKS):
-            key = f'task_{idx}'
-            statuses[task] = key in request.form
-        update_date_data(date_str, statuses)
-        return redirect(url_for('daily', date=date_str))
-
-    # For GET request, load data
-    day_statuses = get_date_data(date_str)
-    return render_template(
-        'daily.html',
-        date=date_str,
-        tasks=TASKS,
-        statuses=day_statuses
-    )
+app = create_app()
 
 if __name__ == '__main__':
-    # Host 0.0.0.0 to allow access from other devices on the LAN
+    # Host 0.0.0.0 so any LAN device can reach it
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+
 
 
 
 FILE: requirements.txt
 
 Flask>=2.2
+Flask-Login>=0.6
+Flask-WTF>=1.0
+Flask-SQLAlchemy>=3.0
+
 
 
 FILE: README.md
@@ -242,8 +71,9 @@ A lightweight local web application for tracking daily tasks with a monthly over
 
 - **Daily Overview** – View and toggle tasks for any chosen day.
 - **Monthly Overview** – See a calendar grid with completion status for each task per day.
+- **ToDo List** – See a list of specific tasks that aren't dailies and track progress on completing them.
 - **Local Server** – Host on your local network so any device on the same LAN can view the site.
-- **Persistent Storage** – Tasks are saved in a JSON file (`tasks.json`).
+- **Persistent Storage** – Tasks are saved in a JSON file (`tasks.json`) and ToDo List items in JSON file (`todolist.json`).
 
 ## Setup
 
@@ -266,7 +96,8 @@ source venv/bin/activate   # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # Running the server
-python app.py
+python run.py
+
 
 FILE: templates/base.html
 
@@ -277,26 +108,37 @@ FILE: templates/base.html
     <title>{% block title %}Task Tracker{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-
 <body>
     <header>
         <h1>Daily Task Tracker</h1>
         <nav>
-            <a href="{{ url_for('monthly') }}">Monthly Overview</a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.monthly') }}">Monthly Overview</a>
+                <a href="{{ url_for('main.todolist') }}" class="nav-btn">ToDo List</a>
+                <a href="{{ url_for('main.logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('main.login') }}">Login</a>
+                <a href="{{ url_for('main.register') }}">Register</a>
+            {% endif %}
         </nav>
 
-        <!-- ──────────────────────────────────────────────────────── -->
-        <!-- Theme switch (same on every page) -->
-        <!-- ──────────────────────────────────────────────────────── -->
         <div class="theme-switch">
             <input type="checkbox" id="theme-toggle" aria-label="Toggle light/dark mode">
             <label for="theme-toggle"></label>
-            <!-- Icon that changes when the theme changes -->
             <span id="theme-label" aria-hidden="true"></span>
         </div>
     </header>
 
     <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, msg in messages %}
+                        <li class="{{ category }}">{{ msg }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
         {% block content %}{% endblock %}
     </main>
 
@@ -304,29 +146,30 @@ FILE: templates/base.html
         <p>&copy; {{ current_year }} $sudo</p>
     </footer>
 
-    <!-- ──────────────────────────────────────────────────────── -->
-    <!-- Load the JS that powers the switch -->
-    <!-- ──────────────────────────────────────────────────────── -->
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 </body>
 </html>
 
 
 
+
+
 FILE: templates/daily.html
 
 {% extends "base.html" %}
-{% block title %}Daily Overview - {{ date }}{% endblock %}
+{% block title %}Daily Overview – {{ date }}{% endblock %}
 {% block content %}
-<h2>Daily Overview - {{ date }}</h2>
+<h2>Daily Overview – {{ date }}</h2>
 
-<form method="get" action="{{ url_for('daily') }}">
+<form method="get" action="{{ url_for('main.daily') }}">
     <label for="date-select">Select date:</label>
     <input type="date" id="date-select" name="date" value="{{ date }}" onchange="this.form.submit()">
 </form>
 
-<form method="post" action="{{ url_for('daily', date=date) }}">
+<form method="post" action="{{ url_for('main.daily', date=date) }}">
     <table class="task-table">
+        <!-- CSRF hidden field -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <thead>
             <tr>
                 <th>Task</th>
@@ -335,24 +178,30 @@ FILE: templates/daily.html
         </thead>
         <tbody>
             {% for task in tasks %}
-                <tr>
-                    <td>{{ task }}</td>
-                    <td>
-                        <!-- Use loop.index0 as the zero‑based index -->
-                        <input type="checkbox"
-                               name="task_{{ loop.index0 }}"
-                               id="task_{{ loop.index0 }}"
-                               {% if statuses[task] %}checked{% endif %}>
-                    </td>
-                </tr>
+            <tr>
+                <td>{{ task }}</td>
+                <td>
+                    <input type="checkbox" name="task_{{ loop.index0 }}"
+                           id="task_{{ loop.index0 }}"
+                           {% if statuses[task] %}checked{% endif %}>
+                    <label for="task_{{ loop.index0 }}">
+                        {% if statuses[task] %}Done{% else %}Pending{% endif %}
+                    </label>
+
+
+                </td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
     <button type="submit">Save</button>
 </form>
 
-<p><a href="{{ url_for('monthly') }}">Back to Monthly Overview</a></p>
+<p><a href="{{ url_for('main.monthly') }}">Back to Monthly Overview</a></p>
+
 {% endblock %}
+
+
 
 
 FILE: templates/monthly.html
@@ -360,53 +209,134 @@ FILE: templates/monthly.html
 {% extends "base.html" %}
 {% block title %}Monthly Overview - {{ month_name }} {{ year }}{% endblock %}
 {% block content %}
-
-<!-- ── Navigation ───────────────────────────────────── -->
 <div class="month-navigation">
-    <a href="{{ url_for('monthly', month=prev_month, year=prev_year) }}"
+    <a href="{{ url_for('main.monthly', month=prev_month, year=prev_year) }}"
        class="nav-btn nav-prev">← Previous Month</a>
-
     <h2>{{ month_name }} {{ year }}</h2>
-
-    <a href="{{ url_for('monthly', month=next_month, year=next_year) }}"
+    <a href="{{ url_for('main.monthly', month=next_month, year=next_year) }}"
        class="nav-btn nav-next">Next Month →</a>
 </div>
 
-<!-- ── Calendar table ──────────────────────────────────── -->
-<h2>Monthly Overview - {{ month_name }} {{ year }}</h2>
 <table class="calendar">
     <thead>
         <tr>
             <th>Task</th>
             {% for day in days %}
-                <th>
-                    <a href="{{ url_for('daily', date=day.date) }}">
-                        {{ day.day }}<br>
-                        {{ day.weekday }}
-                    </a>
-                </th>
+            <th>
+                <a href="{{ url_for('main.daily', date=day.date) }}">
+                    {{ day.day }}<br>{{ day.weekday }}
+                </a>
+            </th>
             {% endfor %}
         </tr>
     </thead>
     <tbody>
         {% for task in tasks %}
-            <tr>
-                <td class="task-name">{{ task }}</td>
-                {% for day in days %}
-                    {% set done = day.statuses[task] %}
-                    <td class="task-cell {% if done %}completed{% else %}incomplete{% endif %}">
-                        {% if done %}
-                            &#10004;
-                        {% else %}
-                            &#10006;
-                        {% endif %}
-                    </td>
-                {% endfor %}
-            </tr>
+        <tr>
+            <td class="task-name">{{ task }}</td>
+            {% for day in days %}
+                {% set done = day.statuses[task] %}
+                <td class="task-cell {% if done %}completed{% else %}incomplete{% endif %}">
+                    {% if done %}&#10004;{% else %}&#10006;{% endif %}
+                </td>
+            {% endfor %}
+        </tr>
         {% endfor %}
     </tbody>
 </table>
+
+<div class="task-form">
+    <h3>Add a new task</h3>
+    <form method="post" action="{{ url_for('main.add_task') }}">
+        <!-- CSRF hidden field -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>
+            Task name:
+            <input type="text" name="name" required>
+        </label>
+        <label>
+            Position (row number):
+            <input type="number" name="position" min="1" step="1">
+        </label>
+        <button type="submit">Add Task</button>
+    </form>
+</div>
 {% endblock %}
+
+
+FILE: templates/todolist.html
+
+{% extends "base.html" %}
+{% block title %}To‑Do List{% endblock %}
+{% block content %}
+<h2>To‑Do List</h2>
+
+<h3>Add new item</h3>
+<form method="post" action="{{ url_for('main.todolist') }}">
+    <input type="hidden" name="action" value="add">
+        <!-- CSRF hidden field -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>
+        Name:
+        <input type="text" name="name" required>
+    </label>
+    <label>
+        <input type="checkbox" name="due_checkbox">
+        Due date:
+        <input type="datetime-local" name="due_date">
+    </label>
+    <button type="submit">Add</button>
+</form>
+
+<h3>Pending Items</h3>
+<ul>
+{% for item in pending %}
+    <li>
+        {{ item.name }}
+        <form method="post" style="display:inline">
+            <input type="hidden" name="action" value="complete">
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+            <button type="submit">Complete</button>
+        </form>
+    </li>
+{% else %}
+    <li>No pending items.</li>
+{% endfor %}
+</ul>
+
+<h3>Scheduled Items</h3>
+<ul>
+{% for item, status_class, due_display in scheduled %}
+    <li class="{{ status_class }}">
+        {{ item.name }} – Due: {{ due_display }}
+        <form method="post" style="display:inline">
+            <input type="hidden" name="action" value="complete">
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+            <button type="submit">Complete</button>
+        </form>
+        <form method="post" style="display:inline">
+            <input type="hidden" name="action" value="remove">
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+            <button type="submit">Remove</button>
+        </form>
+    </li>
+{% else %}
+    <li>No scheduled items.</li>
+{% endfor %}
+</ul>
+
+<h3>Completed Items</h3>
+<ul>
+{% for item in completed %}
+    <li>
+        {{ item.name }} – Completed at {{ item.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+    </li>
+{% else %}
+    <li>No completed items.</li>
+{% endfor %}
+</ul>
+{% endblock %}
+
 
 
 
@@ -562,8 +492,25 @@ main { padding: 20px; }
 }
 .month-navigation .nav-btn:hover { background-color: var(--button-hover); }
 
+/* ------------------------------------------------------------------
+   ToDo navigation button – same look as month navigation
+   ------------------------------------------------------------------ */
+nav a.nav-btn {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin-left: 10px;
+    transition: background-color 0.2s;
+}
+nav a.nav-btn:hover {
+    background-color: var(--button-hover);
+}
+
+
 /* ──────────────────────────────────────────────────────── */
-/*       Theme‑switch styling (checkbox → toggle)           */
+/*       Theme‑switch styling (checkbox   toggle)           */
 /* ──────────────────────────────────────────────────────── */
 .theme-switch {
     display: flex;
@@ -618,39 +565,71 @@ main { padding: 20px; }
     color: var(--text);
 }
 
+/* ── Task‑Form Styling ─────────────────────────────────────────────────────── */
+.task-form {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: var(--header-bg);
+    border-radius: 4px;
+}
 
-FILE: static/js/theme.js
-/* static/js/theme.js – light/dark theme toggle */
+.task-form h3 { margin-top: 0; }
 
-(() => {
-    const themeKey = 'theme';
-    const body = document.body;
-    const toggle = document.getElementById('theme-toggle');
-    const icon  = document.getElementById('theme-label');
+.task-form label {
+    display: block;
+    margin-bottom: 8px;
+}
 
-    // Apply the theme (sets data-theme, checkbox state, and icon)
-    const applyTheme = theme => {
-        body.setAttribute('data-theme', theme);
-        if (toggle) toggle.checked = (theme === 'dark');
-        if (icon)   icon.textContent = theme === 'dark' ? '🌙' : '☀️';
-    };
+.task-form input[type="text"],
+.task-form input[type="number"] {
+    padding: 5px;
+    border: 1px solid var(--input-border);
+    border-radius: 3px;
+    width: 100%;
+    max-width: 300px;
+}
 
-    /* ── Initialise theme on page load ─────────────────────── */
-    const stored = localStorage.getItem(themeKey);
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    let theme = stored ?? (prefersDark ? 'dark' : 'light');
-    applyTheme(theme);
+.task-form button {
+    margin-top: 10px;
+}
 
-    /* ── Listen for toggle changes ─────────────────────────── */
-    if (toggle) {
-        toggle.addEventListener('change', () => {
-            const newTheme = toggle.checked ? 'dark' : 'light';
-            localStorage.setItem(themeKey, newTheme);
-            applyTheme(newTheme);
-        });
-    }
-})();
+/* ------------------------------------------------------------------
+   Colour‑coded scheduled task rows
+------------------------------------------------------------------ */
+.red     { background-color: #f8d7da; }   /* light red */
+.yellow  { background-color: #fff3cd; }   /* light yellow */
+.orange  { background-color: #ffe0b3; }   /* light orange */
+
+/* ------------------------------------------------------------------
+   Remove button styling (so it stands out a bit)
+------------------------------------------------------------------ */
+button.remove {
+    background-color: #dc3545;
+    color: #fff;
+}
+button.remove:hover {
+    background-color: #c82333;
+}
+
+/* ── Flash messages ----------------------------------------------- */
+.flashes {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+.flashes li {
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    color: #fff;
+}
+.flashes .success { background-color: #28a745; }
+.flashes .danger  { background-color: #dc3545; }
+.flashes .warning { background-color: #ffc107; }
+.flashes .info    { background-color: #17a2b8; }
 
 
 
-I want to add the support of this new ToDo list described at the very beginning of this prompt.  What software changes to which files need to be made to accomplish adding the ToDo list as described including all of the specific functionality outlined?  Give detailed and specific instructions on exactly what changes, additions, and deletions need to be made to the software.  If any new files need to be made, explain their purpose and where they fit in the file structure.  Produce professional and clean looking software that is free of any bugs, and produces a clean looking web page.  Take all the time that is necessary, do not stop until completion, and go over everything thoroughly, and go back to ensure everything is formatted cleanly, that the software is free of any bugs, and that it produces a very clean and professional looking website.
+
+
+I want to fix the width of the Table in the Daily Task View from daily.html described at the very beginning of this prompt.  What software changes to which files need to be made to accomplish adding the ToDo list as described including all of the specific functionality outlined?  Give detailed and specific instructions on exactly what changes, additions, and deletions need to be made to the software.  If any new files need to be made, explain their purpose and where they fit in the file structure.  Produce professional and clean looking software that is free of any bugs, and produces a clean looking web page.  Take all the time that is necessary, do not stop until completion, and go over everything thoroughly, and go back to ensure everything is formatted cleanly, that the software is free of any bugs, and that it produces a very clean and professional looking website.

@@ -7,28 +7,47 @@ The file must contain a single line: the key itself (no quotes).
 """
 
 import os
+from pathlib import Path
 
-SECRET_KEY_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), '..', 'secret_key.txt'
-)
+# Path to the secret key file, one level above the package
+SECRET_KEY_FILE = Path(__file__).resolve().parent.parent / 'secret_key.txt'
 
-
-def get_secret_key() -> str:
+def _load_secret_key() -> str:
     """Return the secret key, or raise RuntimeError if not found."""
-    # 1️⃣  Try the file first
-    if os.path.isfile(SECRET_KEY_FILE):
-        with open(SECRET_KEY_FILE, 'r', encoding='utf-8') as f:
-            key = f.read().strip()
-            if key:
-                return key
-
-    # 2️⃣  Fallback to environment variable (useful for Docker / CI)
+    # Try the file first
+    if SECRET_KEY_FILE.is_file():
+        key = SECRET_KEY_FILE.read_text(encoding='utf-8').strip()
+        if key:
+            return key
+    # Fallback to environment variable (useful for Docker / CI)
     key = os.getenv('FLASK_SECRET_KEY')
     if key:
         return key
-
-    # 3️⃣  Nothing found – abort loudly
+    # Nothing found – abort loudly
     raise RuntimeError(
-        "SECRET_KEY not found. Create 'secret_key.txt' or set FLASK_SECRET_KEY."
+        'SECRET_KEY not found. Create secret_key.txt or set FLASK_SECRET_KEY.'
     )
 
+class Config:
+    """Base configuration shared by all environments."""
+    SECRET_KEY = _load_secret_key()
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # SQLite file lives inside the instance folder – cast to string
+    SQLALCHEMY_DATABASE_URI = (
+        f"sqlite:///{Path(__file__).resolve().parent.parent / 'instance' / 'app.db'}"
+    )
+    # Flask‑Login helpers
+    LOGIN_VIEW = 'main.login'
+    LOGIN_MESSAGE_CATEGORY = 'info'
+    # Flask‑WTF CSRF protection
+    WTF_CSRF_ENABLED = True
+
+class DevelopmentConfig(Config):
+    """Development configuration."""
+    DEBUG = True
+    SQLALCHEMY_ECHO = False
+
+class ProductionConfig(Config):
+    """Production configuration."""
+    DEBUG = False
+    SQLALCHEMY_ECHO = False

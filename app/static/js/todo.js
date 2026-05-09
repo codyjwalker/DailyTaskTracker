@@ -1,5 +1,4 @@
-/* static/js/todo.js – show/hide the datetime picker */
-
+// app/static/js/todo.js – show/hide the datetime picker
 (() => {
     const checkbox = document.getElementById('due-checkbox');
     const container = document.getElementById('due-date-container');
@@ -19,4 +18,3 @@
     checkbox.addEventListener('change', toggle);
     toggle(); // initial state
 })();
-

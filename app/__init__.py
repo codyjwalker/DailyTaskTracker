@@ -2,8 +2,8 @@
 """
 Application factory for the Personal Task Tracker.
 
-Now loads SECRET_KEY from app/config.py (which in turn reads a
-private file that lives outside version control).
+Now loads configuration from `app.config` (DevelopmentConfig/ProductionConfig).
+All extensions are initialised here and the blueprint registry is performed.
 """
 
 import os
@@ -17,38 +17,43 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
 
-# Import the helper that fetches the secret key
-from .config import get_secret_key
-
-
-def create_app():
+# ----------------------------------------------------------------------
+# Application factory
+# ----------------------------------------------------------------------
+def create_app(config_name: str = 'development') -> Flask:
     """Create and configure the Flask application."""
-    app = Flask(
-        __name__,
-        instance_relative_config=True,  # instance folder is the parent dir
-    )
+    app = Flask(__name__, instance_relative_config=True)
 
-    # ---------- Configuration ---------------------------------------------
-    app.config.from_mapping(
-        SECRET_KEY=get_secret_key(),
-        SQLALCHEMY_DATABASE_URI='sqlite:///../instance/app.db',
-        SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        LOGIN_VIEW='main.login',
-        LOGIN_MESSAGE_CATEGORY='info',
-    )
+    # Load configuration from the chosen class
+    from .config import DevelopmentConfig, ProductionConfig
+    config_cls = {
+        'development': DevelopmentConfig,
+        'production': ProductionConfig
+    }[config_name]
+    app.config.from_object(config_cls)
 
-    # ---------- Initialise extensions -------------------------------------
+    # Ensure the instance folder exists
+    try:
+        os.makedirs(app.instance_path, exist_ok=True)
+    except OSError as exc:  # pragma: no cover
+        raise RuntimeError(f'Failed to create instance folder: {exc}')
+
+    # Initialise extensions
     db.init_app(app)
     login_manager.init_app(app)
     csrf.init_app(app)
 
-    # ---------- Register routes -------------------------------------------
-    from . import routes  # noqa: F401
-    app.register_blueprint(routes.bp)
+    # Register blueprints
+    from .routes import bp as main_bp
+    app.register_blueprint(main_bp)
 
-    # ---------- Create database tables if missing -------------------------
+    # Create database tables if missing
     with app.app_context():
         db.create_all()
 
-    return app
+    # Provide the current year to all templates
+    @app.context_processor
+    def inject_current_year():
+        return {'current_year': __import__('datetime').datetime.utcnow().year}
 
+    return app

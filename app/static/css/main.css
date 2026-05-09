@@ -1,3 +1,5 @@
+/* FILE:    app/static/css/main.css                        */
+
 /* ──────────────────────────────────────────────────────── */
 /*      Light‑theme defaults (CSS variables)                */
 /* ──────────────────────────────────────────────────────── */
@@ -285,3 +287,4 @@ button.remove:hover {
 .flashes .warning { background-color: #ffc107; }
 .flashes .info    { background-color: #17a2b8; }
 
+/* END:    app/static/css/main.css                        */

@@ -1,5 +1,4 @@
-/* static/js/theme.js – light/dark theme toggle */
-
+// app/static/js/theme.js
 (() => {
     const themeKey = 'theme';
     const body = document.body;
@@ -13,13 +12,13 @@
         if (icon)   icon.textContent = theme === 'dark' ? '🌙' : '☀️';
     };
 
-    /* ── Initialise theme on page load ─────────────────────── */
+    // Initialise theme on page load
     const stored = localStorage.getItem(themeKey);
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     let theme = stored ?? (prefersDark ? 'dark' : 'light');
     applyTheme(theme);
 
-    /* ── Listen for toggle changes ─────────────────────────── */
+    // Listen for toggle changes
     if (toggle) {
         toggle.addEventListener('change', () => {
             const newTheme = toggle.checked ? 'dark' : 'light';
@@ -28,4 +27,3 @@
         });
     }
 })();
-

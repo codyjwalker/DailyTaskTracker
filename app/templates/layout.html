@@ -1,9 +1,9 @@
-<!-- FILE:  app/templates/base.html -->
+<!-- app/templates/layout.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Task Tracker{% endblock %}</title>
+    <title>{% block title %}Personal Task Tracker{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
@@ -12,7 +12,7 @@
         <nav>
             {% if current_user.is_authenticated %}
                 <a href="{{ url_for('main.monthly') }}">Monthly Overview</a>
-                <a href="{{ url_for('main.todolist') }}" class="nav-btn">ToDo List</a>
+                <a href="{{ url_for('main.todolist') }}" class="nav-btn">To‑Do List</a>
                 <a href="{{ url_for('main.logout') }}">Logout</a>
             {% else %}
                 <a href="{{ url_for('main.login') }}">Login</a>
@@ -45,7 +45,7 @@
     </footer>
 
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <!-- Include todo.js only when needed – load unconditionally for simplicity -->
+    <script src="{{ url_for('static', filename='js/todo.js') }}"></script>
 </body>
 </html>
-
-<!-- END:  app/templates/base.html -->

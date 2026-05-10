@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}Confirm Delete{% endblock %}
+{% block content %}
+<h1>Confirm Delete</h1>
+<p>Are you sure you want to delete the list <strong>{{ todo_list.name }}</strong>?</p>
+
+<form method="post" action="{{ url_for('main.confirm_delete_list', list_id=todo_list.id) }}">
+    <!-- CSRF token -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn-danger">Yes, delete</button>
+    <a href="{{ url_for('main.todolists') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

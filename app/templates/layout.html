@@ -1,51 +1,36 @@
-<!-- app/templates/layout.html -->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <title>{% block title %}Personal Task Tracker{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
-    <header>
-        <h1>Daily Task Tracker</h1>
-        <nav>
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('main.monthly') }}">Monthly Overview</a>
-                <a href="{{ url_for('main.todolist') }}" class="nav-btn">To‑Do List</a>
-                <a href="{{ url_for('main.logout') }}">Logout</a>
-            {% else %}
-                <a href="{{ url_for('main.login') }}">Login</a>
-                <a href="{{ url_for('main.register') }}">Register</a>
-            {% endif %}
-        </nav>
+    <nav class="navbar">
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('main.monthly') }}">Monthly Overview</a>
+            <a href="{{ url_for('main.todolists') }}">To‑Do List</a>
+            <a href="{{ url_for('main.logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('main.login') }}">Login</a>
+            <a href="{{ url_for('main.register') }}">Register</a>
+        {% endif %}
+    </nav>
 
-        <div class="theme-switch">
-            <input type="checkbox" id="theme-toggle" aria-label="Toggle light/dark mode">
-            <label for="theme-toggle"></label>
-            <span id="theme-label" aria-hidden="true"></span>
-        </div>
-    </header>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for category, msg in messages %}
+                    <li class="{{ category }}">{{ msg }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
 
-    <main>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul class="flashes">
-                    {% for category, msg in messages %}
-                        <li class="{{ category }}">{{ msg }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
+    <div class="content">
         {% block content %}{% endblock %}
-    </main>
+    </div>
 
-    <footer>
-        <p>&copy; {{ current_year }} $sudo</p>
-    </footer>
-
-    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
-    <!-- Include todo.js only when needed – load unconditionally for simplicity -->
-    <script src="{{ url_for('static', filename='js/todo.js') }}"></script>
+    <footer>© {{ current_year }} $sudo</footer>
 </body>
 </html>

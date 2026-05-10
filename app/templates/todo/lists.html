@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block title %}To‑Do Lists{% endblock %}
+{% block content %}
+<h1>To‑Do Lists</h1>
+
+<a href="{{ url_for('main.monthly') }}">Back to Monthly Overview</a>
+<hr>
+
+<h2>Existing Lists</h2>
+{% if todo_lists %}
+    <ul class="list-group">
+    {% for lst in todo_lists %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('main.todolist', list_id=lst.id) }}">{{ lst.name }}</a>
+            <span class="delete-link">
+                <a href="{{ url_for('main.confirm_delete_list', list_id=lst.id) }}" class="btn btn-sm btn-danger">Delete</a>
+            </span>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No to‑do lists yet.</p>
+{% endif %}
+
+<hr>
+
+<h2>Create New List</h2>
+<form method="post" action="{{ url_for('main.todolists') }}">
+    <!-- CSRF token – required for every POST -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <input type="text" name="name" placeholder="List name" class="form-control" required>
+    <button type="submit" name="action" value="create" class="btn btn-primary mt-2">Create List</button>
+</form>
+{% endblock %}

@@ -1,6 +1,6 @@
 /* app/static/css/style.css */
 
-/* 1. Theme variables -------------------------------------------------------------- */
+/* Theme variables -------------------------------------------------------------- */
 :root { 
   --bg: #ffffff; 
   --text: #222222; 
@@ -23,7 +23,7 @@ html[data-theme="dark"] {
   --border: #555555; 
 } 
 
-/* 2. Global styles -------------------------------------------------------------- */
+/* Global styles -------------------------------------------------------------- */
 html, body { 
   margin: 0; 
   padding: 0; 
@@ -37,7 +37,7 @@ html, body {
 a { color: var(--accent); text-decoration: none; } 
 a:hover { text-decoration: underline; } 
 
-/* 3. Navigation -------------------------------------------------------------- */
+/* Navigation -------------------------------------------------------------- */
 .navbar { 
   display: flex; 
   justify-content: space-between; 
@@ -54,10 +54,10 @@ a:hover { text-decoration: underline; }
   color: var(--text); 
 } 
 
-/* 4. Container & layout ------------------------------------------------------- */
+/* Container & layout ------------------------------------------------------- */
 .container { max-width: 960px; margin: 0 auto; padding: 1rem; } 
 
-/* 5. Flash messages ------------------------------------------------------------- */
+/* Flash messages ------------------------------------------------------------- */
 .flashes { margin-bottom: 1rem; } 
 .flash { padding: .75rem 1rem; margin-bottom: .5rem; border-radius: var(--border-radius); }
 .flash.success { background: var(--success); color: var(--bg); } 
@@ -65,7 +65,7 @@ a:hover { text-decoration: underline; }
 .flash.warning { background: var(--warning); color: var(--text); } 
 .flash.danger { background: var(--danger); color: var(--bg); } 
 
-/* 6. Buttons -------------------------------------------------------------- */
+/* Buttons -------------------------------------------------------------- */
 .btn { 
   display: inline-block; 
   padding: .5rem 1rem; 
@@ -80,7 +80,7 @@ a:hover { text-decoration: underline; }
 .btn.complete-btn { background: var(--success); } 
 .btn.remove-btn { background: var(--warning); } 
 
-/* 7. Forms -------------------------------------------------------------- */
+/* Forms -------------------------------------------------------------- */
 form .form-group { margin-bottom: .75rem; } 
 form .form-control { 
   width: 100%; 
@@ -91,7 +91,7 @@ form .form-control {
   color: var(--text); 
 } 
 
-/* 8. Monthly overview table ------------------------------------------------------- */
+/* Monthly overview table ------------------------------------------------------- */
 .monthly-table { width: 100%; border-collapse: collapse; } 
 .monthly-table th, .monthly-table td { 
   border: 1px solid var(--border); 
@@ -103,14 +103,14 @@ form .form-control {
 .monthly-table .status.done { color: var(--success); } 
 .monthly-table .status.not-done { color: var(--danger); } 
 
-/* 9. Navigation arrows in month view ------------------------------------------ */
+/* Navigation arrows in month view ------------------------------------------ */
 .nav-arrows a { margin: 0 0.5rem; color: var(--accent); text-decoration: none; }
 .nav-arrows a:hover { text-decoration: underline; } 
 
-/* 10. Footer -------------------------------------------------------------- */
+/* Footer -------------------------------------------------------------- */
 footer { text-align: center; margin-top: 2rem; color: var(--border); font-size: .875rem; }
 
-/* 11. Todo List page styling ----------------------------------------------------- */
+/* Todo List page styling ----------------------------------------------------- */
 .list-item {
   display: flex;
   justify-content: space-between;
@@ -121,7 +121,7 @@ footer { text-align: center; margin-top: 2rem; color: var(--border); font-size: 
   margin-left: 0.5rem;
 }
 
-/* 12. Task controls layout */
+/* Task controls layout */
 .task-controls {
   display: flex;
   flex-wrap: wrap;
@@ -139,7 +139,7 @@ footer { text-align: center; margin-top: 2rem; color: var(--border); font-size: 
   margin-top: 0;
 }
 
-/* 13. Lists page */
+/* Lists page */
 .list-group {
     list-style: none;
     padding: 0;
@@ -153,4 +153,44 @@ footer { text-align: center; margin-top: 2rem; color: var(--border); font-size: 
     border: 1px solid var(--border);
     border-radius: var(--border-radius);
     margin-bottom: .5rem;
+}
+
+/* To‑Do List page styling */
+.list-item { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 0.75rem; 
+}
+.list-item .btn { 
+  margin-left: 0.5rem; 
+}
+
+/* Sub‑tasks styling */
+.subtasks {
+    margin-left: 1.5rem;                /* indent nested sub‑tasks */
+}
+.subtask {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .25rem .5rem;
+    margin-bottom: .25rem;
+    background: var(--border);
+    border-radius: var(--border-radius);
+}
+.subtask.completed {
+    background: var(--success);
+    color: var(--bg);
+}
+.subtask-due {
+    margin-left: .5rem;
+    font-size: .9rem;
+    color: var(--warning);
+}
+.subtask-completed-note {
+    margin-left: .5rem;
+    font-size: .85rem;
+    color: var(--text);
+    opacity: .8;
 }

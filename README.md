@@ -30,3 +30,16 @@ echo 'YOUR_RANDOM_KEY' > secret_key.txt
 
 # Run locally
 python run.py
+
+```
+
+### Docker
+```bash
+# Startup
+docker compose up --build -d
+
+```
+
+```bash
+# Shutdown
+docker compose down

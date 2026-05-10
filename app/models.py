@@ -39,8 +39,8 @@ class TaskList(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     name = db.Column(db.String(200), nullable=False)
     position = db.Column(db.Integer, nullable=False, default=0)
-    start_date = db.Column(db.Date, nullable=False)          # <‑‑ new
-    end_date = db.Column(db.Date, nullable=True)            # <‑‑ new
+    start_date = db.Column(db.Date, nullable=False)  # <-- new
+    end_date = db.Column(db.Date, nullable=True)     # <-- new
 
 class DailyTask(db.Model):
     """Stores the completion status of a task on a particular date."""
@@ -74,8 +74,33 @@ class TodoItem(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    todo_list_id = db.Column(db.Integer, db.ForeignKey('todo_lists.id'), nullable=False)
+    todo_list_id = db.Column(db.Integer, db.ForeignKey('todo_lists.id'),
+                            nullable=False)
     name = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Boolean, default=False)
-    timestamp = db.Column(db.DateTime)  # when the item was completed
-    due_date = db.Column(db.DateTime)  # optional due date
+    timestamp = db.Column(db.DateTime)          # when the item was completed
+    due_date = db.Column(db.DateTime)          # optional due date
+
+    # Sub‑tasks relationship – a todo item can have many sub‑tasks
+    subtasks = db.relationship(
+        'SubTask',
+        backref='todo_item',
+        lazy='dynamic',
+        cascade='all, delete-orphan',
+    )
+
+class SubTask(db.Model):
+    """A sub‑task that belongs to a TodoItem.  It inherits the parent’s
+    due‑date behaviour – if the parent has a due date the sub‑task can be
+    scheduled to the same date or any earlier date, otherwise it has no
+    due date."""
+    __tablename__ = 'sub_tasks'
+
+    id = db.Column(db.Integer, primary_key=True)
+    todo_item_id = db.Column(db.Integer, db.ForeignKey('todo_items.id'),
+                             nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    name = db.Column(db.String(200), nullable=False)
+    completed = db.Column(db.Boolean, default=False)
+    timestamp = db.Column(db.DateTime)          # when the sub‑task was completed
+    due_date = db.Column(db.DateTime)          # optional due date, defaults to parent’s

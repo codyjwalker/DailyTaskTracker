@@ -1,249 +1,273 @@
-──────────────────────────────────────────────────────────────────────────────
 ROOT‑LEVEL FILES
-──────────────────────────────────────────────────────────────────────────────
+─────────────────────────────────────────────────────────────────────────────────────
+• .gitignore
+  • Lists the files & directories that Git should ignore (e.g. *.pyc, venv/, instance/,
+    secret_key.txt).  It has no runtime impact but keeps the repo clean.
 
-./.gitignore
-  • Purpose  
-    • Informs Git which files/folders should be ignored when committing.  
-  • Contents  
-    • promtps.txt  
-    • prompts.txt  
-    • venv/  
-    • __pycache__/  
-    • *.pyc  
-    • secret_key.txt  
-    • OLDinstance/  
-  • Usage  
-    • No runtime use – only affects Git tracking.
+• File Descriptions.txt   ← this file
+  • Serves as the official “what‑is‑what” reference for every file in the
+    repository.  The new description below includes the additional
+    Sub‑Task feature and explains all key changes.
 
-./LICENSE
-  • Purpose  
-    • Declares the open‑source license (GNU GPL‑v3).  
-  • Contents  
-    • Full GPL‑v3 text.  
-  • Usage  
-    • Legal reference; no effect on application code.
+• LICENSE
+  • GPL‑3.0 license text.  Required for open‑source compliance; has no
+    runtime effect.
 
-./README.md
-  • Purpose  
-    • Project overview, feature list, and quick‑start guide.  
-  • Contents  
-    • Features: daily/monthly views, to‑do lists, auth, theme toggle.  
-    • Installation instructions, dev environment setup, run commands.  
-  • Usage  
-    • Read by developers, CI pipelines, and the web UI documentation.
+• README.md
+  • Project overview, feature list, quick‑start instructions, and usage
+    examples.  It is the primary onboarding document for developers.
 
-./docker-compose.yml
-  • Purpose  
-    • Defines Docker services for local development.  
-  • Contents  
-    • One service “app”: builds current folder, exposes port 5000.  
-  • Usage  
-    • Run with `docker‑compose up` to launch the container.
+• docker-compose.yml
+  • Defines the local Docker service that builds the Flask image and
+    runs the application on port 5000.  Useful for CI and containerised
+    development.
 
-./dockerfile
-  • Purpose  
-    • Builds the production image.  
-  • Contents  
-    • `python:3` base image, copy all files, install deps, expose 5000, start Flask.  
-  • Usage  
-    • Used by `docker‑compose.yml` to create the container image.
+• dockerfile
+  • Builds the production Docker image from the repository.  It installs
+    the dependencies, copies the source, exposes port 5000 and starts the
+    Flask app with `python run.py`.
 
-./promtps.txt
-  • Purpose  
-    • Developer‑friendly reference containing the project description, file layout diagram, and sample code snippets.  
-  • Contents  
-    • README‑style sections, code snippets for `run.py`, `requirements.txt`, templates, etc.  
-  • Usage  
-    • No runtime effect; serves as internal documentation.
+• promtps.txt
+  • Human‑readable reference that lists key commands, environment
+    variables and snippets.  It is a developer aid only.
 
-./requirements.txt
-  • Purpose  
-    • Lists Python package dependencies.  
-  • Contents  
-    • `Flask>=2.2`, `Flask‑Login>=0.6`, `Flask‑WTF>=1.0`, `Flask‑SQLAlchemy>=3.0`.  
-  • Usage  
-    • `pip install -r requirements.txt` installs the deps.
+• requirements.txt
+  • Pin the exact Python packages required for the app:
+    Flask, Flask‑Login, Flask‑WTF, Flask‑SQLAlchemy, Werkzeug, etc.
 
-./run.py
-  • Purpose  
-    • Application entry point.  
-  • Contents  
-    • Calls `create_app()` from `app/__init__.py` and runs on 0.0.0.0:5000.  
-  • Usage  
-    • Executed by developers (`python run.py`) and by the Dockerfile.
+• run.py
+  • Entrypoint that imports the Flask factory `create_app()` from
+    `app/__init__.py`, creates the app instance and runs it on
+    0.0.0.0:5000.
 
-./secret_key.txt
-  • Purpose  
-    • Holds the Flask secret key (not committed).  
-  • Contents  
-    • One line containing a random string, no quotes.  
-  • Usage  
-    • Read by `app/config.py` for `SECRET_KEY`.
+• secret_key.txt
+  • Stores a single line of random text that is read by
+    `app/config.py` to set Flask’s `SECRET_KEY`.  This file is
+    intentionally omitted from Git to keep the key secret.
 
-──────────────────────────────────────────────────────────────────────────────
-APP PACKAGE
-──────────────────────────────────────────────────────────────────────────────
 
+
+APP PACKAGE (app/)
+────────────────────────────────────────────────────────────────────────────────────
+The *app* package contains the core Flask application: configuration,
+database models, forms, helper functions, view routes, static assets
+(CSS/JS) and Jinja2 templates.  The following sections describe
+every file in the package.
+
+--------------------------------------------------------------------
 app/__init__.py
-  • Purpose  
-    • Application factory that creates the Flask app.  
-  • Contents  
-    • Imports Flask, SQLAlchemy, LoginManager, CSRFProtect.  
-    • Creates `db`, `login_manager`, `csrf`.  
-    • `create_app()` loads config, initializes extensions, registers the single `main` blueprint, creates DB tables, injects current year into templates.  
-  • Usage  
-    • Imported by `run.py` and by route modules.
+  • Application factory that:
+    – Instantiates extensions (SQLAlchemy, LoginManager, CSRFProtect).
+    – Loads configuration from `app/config.py` (`DevelopmentConfig` /
+      `ProductionConfig`).
+    – Registers the single Blueprint `main` from `app/routes/__init__.py`.
+    – Creates the database tables on startup (`db.create_all()`).
+  • Returns the Flask app instance.
+  • No changes were made to this file for the Sub‑Task feature.
 
+--------------------------------------------------------------------
 app/config.py
-  • Purpose  
-    • Central configuration and secret‑key loader.  
-  • Contents  
-    • Reads `secret_key.txt` or env var `FLASK_SECRET_KEY`.  
-    • Defines `Config`, `DevelopmentConfig`, `ProductionConfig`.  
-    • Sets `SQLALCHEMY_DATABASE_URI` to `instance/app.db`.  
-  • Usage  
-    • Imported by `app/__init__.py`.
+  • Holds two configuration classes:
+    – `DevelopmentConfig` – debug on, SQLite dev database, etc.
+    – `ProductionConfig` – minimal config for production.
+  • Reads `SECRET_KEY` from the `secret_key.txt` file.
+  • Unchanged for the new feature.
 
+--------------------------------------------------------------------
 app/forms.py
-  • Purpose  
-    • WTForms for user registration and login.  
-  • Contents  
-    • `RegistrationForm`: username, password, confirm, submit.  
-    • `LoginForm`: username, password, remember, submit.  
-  • Usage  
-    • Rendered by `app/routes/auth.py`.
+  • WTForms definitions for user registration and login.
+  • No change needed for sub‑tasks – the feature is handled entirely
+    in routes and templates.
 
+--------------------------------------------------------------------
 app/helpers.py
-  • Purpose  
-    • Utility functions used throughout the app.  
-  • Contents  
-    • `DEFAULT_TASK_NAMES` list.  
-    • `init_user_task_list(user)` – seeds default tasks for a new user.  
-    • `get_monthly_view(user, year, month)` – builds calendar data.  
-    • `get_daily_status(user, date_str)` – returns status map for a day.  
-    • `update_daily_status(user, date_str, statuses)` – persists changes.  
-  • Usage  
-    • Imported by route modules (`tasks.py`, `auth.py`).
+  • Utility functions that drive the daily/monthly task views.
+  • Functions such as `init_user_task_list`, `get_monthly_view`,
+    `get_daily_status`, and `update_daily_status` remain untouched.
+  • Sub‑tasks do not interact with these helpers.
 
+--------------------------------------------------------------------
 app/models.py
-  • Purpose  
-    • SQLAlchemy ORM models.  
-  • Contents  
-    • `User`: username, password hash, relationships.  
-    • `TaskList`: task names per user.  
-    • `DailyTask`: status per date.  
-    • `TodoList`: named lists.  
-    • `TodoItem`: items with due/completion.  
-  • Usage  
-    • Accessed by routes, helpers, and forms.
+  • Core SQLAlchemy ORM definitions for the application.
+  • **New additions**:
+    – `SubTask` model – represents a child task belonging to a
+      `TodoItem`.  It stores `name`, `completed`, `timestamp`,
+      `due_date`, and foreign keys to the parent `TodoItem` and the
+      owning `User`.
+    – Relationship `subtasks` added to `TodoItem` (one‑to‑many,
+      cascade delete‑orphan).
+  • Existing tables (`User`, `TaskList`, `DailyTask`, `TodoList`,
+    `TodoItem`) remain unchanged.  The new model is created on the
+    next `db.create_all()` call.
 
-app/routes/
-  ├── __init__.py
-  │   • Purpose  
-  │     • Creates a single `main` blueprint and imports all sub‑modules.  
-  │   • Contents  
-  │     • `bp = Blueprint('main', __name__)`; side‑effect imports `auth`, `tasks`, `todo`.  
-  │   • Usage  
-  │     • Registered in `app/__init__.py`.  
-  │
-  ├── auth.py
-  │   • Purpose  
-  │     • Handles login, registration, logout.  
-  │   • Contents  
-  │     • Routes `/`, `/login`, `/register`, `/logout`.  
-  │     • Creates users, logs in, flashes messages.  
-  │   • Usage  
-  │     • Imports `User`, `db`, `login_manager`, `helpers.init_user_task_list`.  
-  │
-  ├── tasks.py
-  │   • Purpose  
-  │     • Daily and monthly task views.  
-  │   • Contents  
-  │     • `/monthly` (calendar), `/daily` (task table), `/add_task` (add new task).  
-  │     • Uses helpers for data and updates.  
-  │   • Usage  
-  │     • Calls `helpers.get_monthly_view`, `helpers.get_daily_status`, `helpers.update_daily_status`.  
-  │
-  └── todo.py
-      • Purpose  
-      • Handles To‑Do list CRUD.  
-      • `/todolists` (overview, create/delete), `/todolists/delete/<list_id>` (confirm), `/todolist/<list_id>` (view/edit list).  
-      • Uses `TodoList`, `TodoItem`, `db`.  
+--------------------------------------------------------------------
+app/routes/__init__.py
+  • Creates the Blueprint `main` (`bp = Blueprint('main', __name__)`).
+  • Imports sub‑modules (`auth`, `tasks`, `todo`) so that all routes
+    are registered.
+  • No changes for sub‑tasks.
 
-app/static/
-  ├── css/
-  │   └── style.css
-  │       • Purpose: theme variables, global styles, component styling.  
-  │       • Contents: root variables for light/dark, layout, nav, flash messages, tables, buttons, forms.  
-  │       • Usage: Served via Flask’s static folder, linked in `templates/base.html`.  
-  ├── js/
-  │   ├── theme.js
-  │   │   • Purpose: light/dark theme toggle, persistence in localStorage.  
-  │   │   • Contents: sets `data-theme`, updates toggle button, listens to click events.  
-  │   │   • Usage: Included in `base.html`.  
-  │   └── todo.js
-  │       • Purpose: show/hide due‑date picker in To‑Do list form.  
-  │       • Contents: toggles visibility based on checkbox, clears input when unchecked.  
-  │       • Usage: Included in `templates/todo/todolist.html`.  
+--------------------------------------------------------------------
+app/routes/auth.py
+  • Handles `/`, `/login`, `/register`, and `/logout`.
+  • Uses `User` model and `LoginManager` for authentication.
+  • No modifications required for sub‑tasks.
 
-app/templates/
-  ├── base.html
-  │   • Purpose: Main layout template.  
-  │   • Contents: blocks `title`, `content`; header with nav, theme toggle, flash messages, footer.  
-  │   • Usage: All other templates extend this.  
-  ├── auth/
-  │   ├── login.html
-  │   │   • Purpose: Login page.  
-  │   │   • Contents: renders `LoginForm`.  
-  │   │   • Usage: `/login` route.  
-  │   └── register.html
-  │       • Purpose: Registration page.  
-  │       • Contents: renders `RegistrationForm`.  
-  │       • Usage: `/register` route.  
-  ├── tasks/
-  │   ├── daily.html
-  │   │   • Purpose: Daily overview page.  
-  │   │   • Contents: date selector, task table with checkboxes, submit button.  
-  │   │   • Usage: `/daily` route.  
-  │   └── monthly.html
-  │       • Purpose: Monthly calendar view.  
-  │       • Contents: month navigation, table of days and tasks with checkmarks, add‑task form.  
-  │       • Usage: `/monthly` route.  
-  └── todo/
-      ├── lists.html
-      │   • Purpose: To‑Do lists overview.  
-      │   • Contents: shows existing lists, delete buttons, form to create new list.  
-      │   • Usage: `/todolists` route.  
-      ├── confirm_delete.html
-      │   • Purpose: Delete confirmation page.  
-      │   • Contents: simple yes/no form.  
-      │   • Usage: `/todolists/delete/<list_id>` route.  
-      └── todolist.html
-          • Purpose: Single To‑Do list page.  
-          • Contents: pending, scheduled, completed items; forms to add, complete, remove items.  
-          • Usage: `/todolist/<list_id>` route.  
+--------------------------------------------------------------------
+app/routes/tasks.py
+  • Provides `/daily` and `/monthly` views that display the
+    recurring daily‑task list and a calendar grid.
+  • Uses helpers from `app/helpers.py` for data processing.
+  • Sub‑task logic is unrelated to this module – it stays the same.
 
-──────────────────────────────────────────────────────────────────────────────
-INSTANCE DATA
-──────────────────────────────────────────────────────────────────────────────
+--------------------------------------------------------------------
+app/routes/todo.py
+  • **Core change** – contains the full logic for the To‑Do list
+    feature, extended to support sub‑tasks.
+  • Major actions handled:
+    * `todolists` – list creation / display.
+    * `confirm_delete_list` – confirm & delete a list.
+    * `todolist` – show a specific list and process:
+      – add normal items (`action='add'`).
+      – add a sub‑task (`action='add_sub'`).
+      – complete a normal item (`action='complete'`).
+      – complete a sub‑task (`action='complete_sub'`).
+      – remove a normal item (`action='remove'`).
+      – remove a sub‑task (`action='remove_sub'`).
+  • When a parent item is marked completed, all its `subtasks` are
+    marked completed at the same timestamp.  Sub‑tasks can also be
+    completed individually; in that case they are only visually
+    flagged (green background) and do not move to the Completed
+    section.
+  • Uses `db.joinedload('subtasks')` to eager‑load the relationship
+    and avoid N+1 queries.
+  • No other modules are affected.
 
-instance/app.db
-  • Purpose  
-    • SQLite database file that stores all application data.  
-  • Contents  
-    • Tables: users, task_lists, daily_tasks, todo_lists, todo_items.  
-  • Usage  
-    • Created on first run by `db.create_all()` in `app/__init__.py`.  
+--------------------------------------------------------------------
+app/static/css/style.css
+  • **New CSS rules** for sub‑task presentation:
+    – `.subtasks` – indented container.
+    – `.subtask` – flex container with padding, background,
+      border‑radius.
+    – `.subtask.completed` – green background to indicate
+      completion.
+    – `.subtask-due`, `.subtask-completed-note` – subtle styling for
+      due dates and completion timestamps.
+  • The existing theme variables, global layout, button styles,
+    forms, tables, and the To‑Do list section remain unchanged.
 
-──────────────────────────────────────────────────────────────────────────────
-NOTES
-──────────────────────────────────────────────────────────────────────────────
+--------------------------------------------------------------------
+app/static/js/theme.js
+  • Handles the light/dark theme toggle.
+  • Reads/writes `data-theme` on the `<html>` element and stores the
+    choice in `localStorage`.  Unchanged for the sub‑task feature.
 
-* The secret key must be present in `secret_key.txt` (single line, no quotes) or set as the environment variable `FLASK_SECRET_KEY`.  
-* The app uses Flask‑Login for session‑based authentication, CSRF protection, and SQLAlchemy for data persistence.  
-* Theme toggling is handled client‑side with `theme.js`; the current theme is stored in `localStorage`.  
-* Docker can be used for quick deployment: `docker‑compose up` will start the app on port 5000.  
-* `promtps.txt` contains a verbose, developer‑friendly description and is not required for runtime.  
+--------------------------------------------------------------------
+app/static/js/todo.js
+  • **Enhanced script** that now works with multiple
+    “due‑date” toggles – both the main item form and any sub‑task
+    form.
+  • Uses a `data-target` attribute to link each checkbox to its
+    corresponding date‑picker container.
+  • On change it shows/hides the container and clears the input when
+    unchecked.
+  • Keeps the original behaviour for the top‑level add‑item form.
 
-──────────────────────────────────────────────────────────────────────────────
+--------------------------------------------------------------------
+app/templates/base.html
+  • Main layout template:
+    – `<head>` includes the CSS/JS assets, theme toggle button.
+    – `<header>` contains the navigation bar and theme toggle.
+    – `<main>` block is overridden by child templates.
+    – `<footer>` shows the current year (provided by a context processor).
+  • No structural changes for sub‑tasks.
+
+--------------------------------------------------------------------
+app/templates/auth/login.html
+  • Renders the login form (`LoginForm`).
+  • Displays flashed messages and a link to register.
+
+--------------------------------------------------------------------
+app/templates/auth/register.html
+  • Renders the registration form (`RegistrationForm`).
+  • Displays flashed messages and a link to log in.
+
+--------------------------------------------------------------------
+app/templates/tasks/daily.html
+  • Displays the daily task table for a chosen date.
+  • Checkboxes represent completion status; form posts back to
+    `/daily` for bulk updates.
+  • Unchanged by the sub‑task feature.
+
+--------------------------------------------------------------------
+app/templates/tasks/monthly.html
+  • Calendar view that shows each day’s completion status.
+  • Uses helper functions to build the month grid.
+  • Unchanged by the sub‑task feature.
+
+--------------------------------------------------------------------
+app/templates/todo/confirm_delete.html
+  • Confirmation page shown before deleting a To‑Do list.
+  • Provides “Yes” and “Cancel” actions.
+
+--------------------------------------------------------------------
+app/templates/todo/lists.html
+  • Overview page showing all lists for the current user.
+  • Allows creating a new list and deleting existing ones.
+
+--------------------------------------------------------------------
+app/templates/todo/todolist.html
+  • Core UI for a single To‑Do list:
+    – Header with the list name and back‑to‑lists link.
+    – Form for adding a new item (name, optional due date).
+    – Three sections: Pending, Scheduled, Completed.
+    – Each parent item shows:
+      * name,
+      * “Complete” and “Remove” buttons,
+      * nested `.subtasks` block (if any).
+    – Sub‑task block:
+      * name,
+      * optional due date (if the parent has one),
+      * “Complete” and “Remove” buttons,
+      * green background when completed.
+    – Form to add a sub‑task under a parent item:
+      * hidden until the “Due date” checkbox is checked,
+      * uses unique IDs and `data-target` for the JS to toggle
+        visibility.
+    – Completed items section shows the parent and its completed
+      sub‑tasks with timestamps.
+  • The template uses standard Bootstrap‑style classes defined in
+    `style.css` and includes the `todo.js` script for date‑picker
+    toggling.
+
+--------------------------------------------------------------------
+APP INSTANCE FOLDER
+────────────────────────────────────────────────────────────────────────────────────
+The `instance/` directory is created automatically by Flask.  It contains:
+
+• `app.db` – SQLite database file (auto‑generated).
+• `secret_key.txt` – Not part of the repo, but read by `config.py`.
+
+--------------------------------------------------------------------
+DATABASE MIGRATION NOTE
+────────────────────────────────────────────────────────────────────────────────────
+Adding the `SubTask` model requires a fresh database or a migration:
+  1. Delete `instance/app.db` (or run an Alembic migration if used).
+  2. Restart the application – `app/__init__.py` calls `db.create_all()`,
+     creating the `sub_tasks` table.
+  3. Existing users can start adding sub‑tasks immediately.
+
+--------------------------------------------------------------------
+SUMMARY OF NEW FEATURE
+────────────────────────────────────────────────────────────────────────────────────
+• Users can create nested sub‑tasks under any To‑Do item.
+• Sub‑tasks inherit the parent’s due‑date logic; if the parent has
+  a due date, a sub‑task’s due date defaults to that date but can be
+  set to any earlier date.
+• Completing a parent automatically completes all its sub‑tasks.
+• Completing a sub‑task only gives a green background; it stays on the
+  parent list until the parent is completed.
+• All actions are protected by CSRF tokens, logged‑in checks, and
+  user‑scoped queries, ensuring no cross‑user data leakage.
+• UI uses indentation, color cues, and a single JavaScript helper
+  that handles multiple due‑date pickers.

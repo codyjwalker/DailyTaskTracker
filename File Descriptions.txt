@@ -1,0 +1,249 @@
+──────────────────────────────────────────────────────────────────────────────
+ROOT‑LEVEL FILES
+──────────────────────────────────────────────────────────────────────────────
+
+./.gitignore
+  • Purpose  
+    • Informs Git which files/folders should be ignored when committing.  
+  • Contents  
+    • promtps.txt  
+    • prompts.txt  
+    • venv/  
+    • __pycache__/  
+    • *.pyc  
+    • secret_key.txt  
+    • OLDinstance/  
+  • Usage  
+    • No runtime use – only affects Git tracking.
+
+./LICENSE
+  • Purpose  
+    • Declares the open‑source license (GNU GPL‑v3).  
+  • Contents  
+    • Full GPL‑v3 text.  
+  • Usage  
+    • Legal reference; no effect on application code.
+
+./README.md
+  • Purpose  
+    • Project overview, feature list, and quick‑start guide.  
+  • Contents  
+    • Features: daily/monthly views, to‑do lists, auth, theme toggle.  
+    • Installation instructions, dev environment setup, run commands.  
+  • Usage  
+    • Read by developers, CI pipelines, and the web UI documentation.
+
+./docker-compose.yml
+  • Purpose  
+    • Defines Docker services for local development.  
+  • Contents  
+    • One service “app”: builds current folder, exposes port 5000.  
+  • Usage  
+    • Run with `docker‑compose up` to launch the container.
+
+./dockerfile
+  • Purpose  
+    • Builds the production image.  
+  • Contents  
+    • `python:3` base image, copy all files, install deps, expose 5000, start Flask.  
+  • Usage  
+    • Used by `docker‑compose.yml` to create the container image.
+
+./promtps.txt
+  • Purpose  
+    • Developer‑friendly reference containing the project description, file layout diagram, and sample code snippets.  
+  • Contents  
+    • README‑style sections, code snippets for `run.py`, `requirements.txt`, templates, etc.  
+  • Usage  
+    • No runtime effect; serves as internal documentation.
+
+./requirements.txt
+  • Purpose  
+    • Lists Python package dependencies.  
+  • Contents  
+    • `Flask>=2.2`, `Flask‑Login>=0.6`, `Flask‑WTF>=1.0`, `Flask‑SQLAlchemy>=3.0`.  
+  • Usage  
+    • `pip install -r requirements.txt` installs the deps.
+
+./run.py
+  • Purpose  
+    • Application entry point.  
+  • Contents  
+    • Calls `create_app()` from `app/__init__.py` and runs on 0.0.0.0:5000.  
+  • Usage  
+    • Executed by developers (`python run.py`) and by the Dockerfile.
+
+./secret_key.txt
+  • Purpose  
+    • Holds the Flask secret key (not committed).  
+  • Contents  
+    • One line containing a random string, no quotes.  
+  • Usage  
+    • Read by `app/config.py` for `SECRET_KEY`.
+
+──────────────────────────────────────────────────────────────────────────────
+APP PACKAGE
+──────────────────────────────────────────────────────────────────────────────
+
+app/__init__.py
+  • Purpose  
+    • Application factory that creates the Flask app.  
+  • Contents  
+    • Imports Flask, SQLAlchemy, LoginManager, CSRFProtect.  
+    • Creates `db`, `login_manager`, `csrf`.  
+    • `create_app()` loads config, initializes extensions, registers the single `main` blueprint, creates DB tables, injects current year into templates.  
+  • Usage  
+    • Imported by `run.py` and by route modules.
+
+app/config.py
+  • Purpose  
+    • Central configuration and secret‑key loader.  
+  • Contents  
+    • Reads `secret_key.txt` or env var `FLASK_SECRET_KEY`.  
+    • Defines `Config`, `DevelopmentConfig`, `ProductionConfig`.  
+    • Sets `SQLALCHEMY_DATABASE_URI` to `instance/app.db`.  
+  • Usage  
+    • Imported by `app/__init__.py`.
+
+app/forms.py
+  • Purpose  
+    • WTForms for user registration and login.  
+  • Contents  
+    • `RegistrationForm`: username, password, confirm, submit.  
+    • `LoginForm`: username, password, remember, submit.  
+  • Usage  
+    • Rendered by `app/routes/auth.py`.
+
+app/helpers.py
+  • Purpose  
+    • Utility functions used throughout the app.  
+  • Contents  
+    • `DEFAULT_TASK_NAMES` list.  
+    • `init_user_task_list(user)` – seeds default tasks for a new user.  
+    • `get_monthly_view(user, year, month)` – builds calendar data.  
+    • `get_daily_status(user, date_str)` – returns status map for a day.  
+    • `update_daily_status(user, date_str, statuses)` – persists changes.  
+  • Usage  
+    • Imported by route modules (`tasks.py`, `auth.py`).
+
+app/models.py
+  • Purpose  
+    • SQLAlchemy ORM models.  
+  • Contents  
+    • `User`: username, password hash, relationships.  
+    • `TaskList`: task names per user.  
+    • `DailyTask`: status per date.  
+    • `TodoList`: named lists.  
+    • `TodoItem`: items with due/completion.  
+  • Usage  
+    • Accessed by routes, helpers, and forms.
+
+app/routes/
+  ├── __init__.py
+  │   • Purpose  
+  │     • Creates a single `main` blueprint and imports all sub‑modules.  
+  │   • Contents  
+  │     • `bp = Blueprint('main', __name__)`; side‑effect imports `auth`, `tasks`, `todo`.  
+  │   • Usage  
+  │     • Registered in `app/__init__.py`.  
+  │
+  ├── auth.py
+  │   • Purpose  
+  │     • Handles login, registration, logout.  
+  │   • Contents  
+  │     • Routes `/`, `/login`, `/register`, `/logout`.  
+  │     • Creates users, logs in, flashes messages.  
+  │   • Usage  
+  │     • Imports `User`, `db`, `login_manager`, `helpers.init_user_task_list`.  
+  │
+  ├── tasks.py
+  │   • Purpose  
+  │     • Daily and monthly task views.  
+  │   • Contents  
+  │     • `/monthly` (calendar), `/daily` (task table), `/add_task` (add new task).  
+  │     • Uses helpers for data and updates.  
+  │   • Usage  
+  │     • Calls `helpers.get_monthly_view`, `helpers.get_daily_status`, `helpers.update_daily_status`.  
+  │
+  └── todo.py
+      • Purpose  
+      • Handles To‑Do list CRUD.  
+      • `/todolists` (overview, create/delete), `/todolists/delete/<list_id>` (confirm), `/todolist/<list_id>` (view/edit list).  
+      • Uses `TodoList`, `TodoItem`, `db`.  
+
+app/static/
+  ├── css/
+  │   └── style.css
+  │       • Purpose: theme variables, global styles, component styling.  
+  │       • Contents: root variables for light/dark, layout, nav, flash messages, tables, buttons, forms.  
+  │       • Usage: Served via Flask’s static folder, linked in `templates/base.html`.  
+  ├── js/
+  │   ├── theme.js
+  │   │   • Purpose: light/dark theme toggle, persistence in localStorage.  
+  │   │   • Contents: sets `data-theme`, updates toggle button, listens to click events.  
+  │   │   • Usage: Included in `base.html`.  
+  │   └── todo.js
+  │       • Purpose: show/hide due‑date picker in To‑Do list form.  
+  │       • Contents: toggles visibility based on checkbox, clears input when unchecked.  
+  │       • Usage: Included in `templates/todo/todolist.html`.  
+
+app/templates/
+  ├── base.html
+  │   • Purpose: Main layout template.  
+  │   • Contents: blocks `title`, `content`; header with nav, theme toggle, flash messages, footer.  
+  │   • Usage: All other templates extend this.  
+  ├── auth/
+  │   ├── login.html
+  │   │   • Purpose: Login page.  
+  │   │   • Contents: renders `LoginForm`.  
+  │   │   • Usage: `/login` route.  
+  │   └── register.html
+  │       • Purpose: Registration page.  
+  │       • Contents: renders `RegistrationForm`.  
+  │       • Usage: `/register` route.  
+  ├── tasks/
+  │   ├── daily.html
+  │   │   • Purpose: Daily overview page.  
+  │   │   • Contents: date selector, task table with checkboxes, submit button.  
+  │   │   • Usage: `/daily` route.  
+  │   └── monthly.html
+  │       • Purpose: Monthly calendar view.  
+  │       • Contents: month navigation, table of days and tasks with checkmarks, add‑task form.  
+  │       • Usage: `/monthly` route.  
+  └── todo/
+      ├── lists.html
+      │   • Purpose: To‑Do lists overview.  
+      │   • Contents: shows existing lists, delete buttons, form to create new list.  
+      │   • Usage: `/todolists` route.  
+      ├── confirm_delete.html
+      │   • Purpose: Delete confirmation page.  
+      │   • Contents: simple yes/no form.  
+      │   • Usage: `/todolists/delete/<list_id>` route.  
+      └── todolist.html
+          • Purpose: Single To‑Do list page.  
+          • Contents: pending, scheduled, completed items; forms to add, complete, remove items.  
+          • Usage: `/todolist/<list_id>` route.  
+
+──────────────────────────────────────────────────────────────────────────────
+INSTANCE DATA
+──────────────────────────────────────────────────────────────────────────────
+
+instance/app.db
+  • Purpose  
+    • SQLite database file that stores all application data.  
+  • Contents  
+    • Tables: users, task_lists, daily_tasks, todo_lists, todo_items.  
+  • Usage  
+    • Created on first run by `db.create_all()` in `app/__init__.py`.  
+
+──────────────────────────────────────────────────────────────────────────────
+NOTES
+──────────────────────────────────────────────────────────────────────────────
+
+* The secret key must be present in `secret_key.txt` (single line, no quotes) or set as the environment variable `FLASK_SECRET_KEY`.  
+* The app uses Flask‑Login for session‑based authentication, CSRF protection, and SQLAlchemy for data persistence.  
+* Theme toggling is handled client‑side with `theme.js`; the current theme is stored in `localStorage`.  
+* Docker can be used for quick deployment: `docker‑compose up` will start the app on port 5000.  
+* `promtps.txt` contains a verbose, developer‑friendly description and is not required for runtime.  
+
+──────────────────────────────────────────────────────────────────────────────

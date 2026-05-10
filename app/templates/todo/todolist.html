@@ -28,20 +28,20 @@
     <div class="list-item">
       <span>{{ item.name }}</span>
       <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
-        {{ csrf_token() }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" value="complete">
         <input type="hidden" name="item_id" value="{{ item.id }}">
         <button type="submit" class="btn complete-btn">Complete</button>
       </form>
       <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
-        {{ csrf_token() }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" value="remove">
         <input type="hidden" name="item_id" value="{{ item.id }}">
         <button type="submit" class="btn delete-btn">Remove</button>
       </form>
 
       <!-- Sub‑tasks for this item -->
-      {% if item.subtasks.count() %}
+      {% if item.subtasks|length %}
         <div class="subtasks">
           {% for sub in item.subtasks %}
             <div class="subtask{% if sub.completed %} completed{% endif %}">
@@ -50,13 +50,13 @@
                 <span class="subtask-due">– Due: {{ sub.due_date.strftime('%Y-%m-%d %H:%M') }}</span>
               {% endif %}
               <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
-                {{ csrf_token() }}
+				<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="action" value="complete_sub">
                 <input type="hidden" name="subtask_id" value="{{ sub.id }}">
                 <button type="submit" class="btn complete-btn">Complete</button>
               </form>
               <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
-                {{ csrf_token() }}
+				<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="action" value="remove_sub">
                 <input type="hidden" name="subtask_id" value="{{ sub.id }}">
                 <button type="submit" class="btn delete-btn">Remove</button>
@@ -68,7 +68,7 @@
 
       <!-- Form to add a sub‑task -->
       <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" class="subtask-form">
-        {{ csrf_token() }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" value="add_sub">
         <input type="hidden" name="parent_id" value="{{ item.id }}">
         <div class="form-group">
@@ -103,20 +103,20 @@
     <div class="list-item {{ status_class }}">
       <span>{{ item.name }} – Due: {{ due_display }}</span>
       <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
-        {{ csrf_token() }}
+		<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" value="complete">
         <input type="hidden" name="item_id" value="{{ item.id }}">
         <button type="submit" class="btn complete-btn">Complete</button>
       </form>
       <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
-        {{ csrf_token() }}
+		<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" value="remove">
         <input type="hidden" name="item_id" value="{{ item.id }}">
         <button type="submit" class="btn delete-btn">Remove</button>
       </form>
 
       <!-- Sub‑tasks for this scheduled item -->
-      {% if item.subtasks.count() %}
+      {% if item.subtasks|length %}
         <div class="subtasks">
           {% for sub in item.subtasks %}
             <div class="subtask{% if sub.completed %} completed{% endif %}">
@@ -125,13 +125,13 @@
                 <span class="subtask-due">– Due: {{ sub.due_date.strftime('%Y-%m-%d %H:%M') }}</span>
               {% endif %}
               <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
-                {{ csrf_token() }}
+				<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="action" value="complete_sub">
                 <input type="hidden" name="subtask_id" value="{{ sub.id }}">
                 <button type="submit" class="btn complete-btn">Complete</button>
               </form>
               <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
-                {{ csrf_token() }}
+				<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="action" value="remove_sub">
                 <input type="hidden" name="subtask_id" value="{{ sub.id }}">
                 <button type="submit" class="btn delete-btn">Remove</button>
@@ -143,7 +143,7 @@
 
       <!-- Form to add a sub‑task -->
       <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" class="subtask-form">
-        {{ csrf_token() }}
+		<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" value="add_sub">
         <input type="hidden" name="parent_id" value="{{ item.id }}">
         <div class="form-group">
@@ -178,14 +178,14 @@
     <div class="list-item">
       <span>{{ item.name }} – Completed at {{ item.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span>
       <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
-        {{ csrf_token() }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" value="remove">
         <input type="hidden" name="item_id" value="{{ item.id }}">
         <button type="submit" class="btn delete-btn">Remove</button>
       </form>
 
       <!-- Sub‑tasks that were completed with the parent -->
-      {% if item.subtasks.count() %}
+      {% if item.subtasks|length %}
         <div class="subtasks">
           {% for sub in item.subtasks %}
             <div class="subtask{% if sub.completed %} completed{% endif %}">

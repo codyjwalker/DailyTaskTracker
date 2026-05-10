@@ -1,111 +1,122 @@
-/* app/static/css/styles.css */
+/* app/static/css/style.css */
 
-/* 1. Theme variables ------------------------------------------------------- */
-:root {
-  --bg: #ffffff;
-  --text: #222222;
-  --accent: #007bff;
-  --danger: #dc3545;
-  --success: #28a745;
-  --warning: #ffc107;
-  --border: #ced4da;
-  --border-radius: 4px;
-  --font-family: system-ui, sans-serif;
-}
+/* 1. Theme variables -------------------------------------------------------------- */
+:root { 
+  --bg: #ffffff; 
+  --text: #222222; 
+  --accent: #007bff; 
+  --danger: #dc3545; 
+  --success: #28a745; 
+  --warning: #ffc107; 
+  --border: #ced4da; 
+  --border-radius: 4px; 
+  --font-family: system-ui, sans-serif; 
+} 
 
-html[data-theme="dark"] {
-  --bg: #222222;
-  --text: #f0f0f0;
-  --accent: #90caf9;
-  --danger: #f44336;
-  --success: #4caf50;
-  --warning: #ffeb3b;
-  --border: #555555;
-}
+html[data-theme="dark"] { 
+  --bg: #222222; 
+  --text: #f0f0f0; 
+  --accent: #90caf9; 
+  --danger: #f44336; 
+  --success: #4caf50; 
+  --warning: #ffeb3b; 
+  --border: #555555; 
+} 
 
-/* 2. Global styles -------------------------------------------------------- */
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: var(--font-family);
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.5;
-}
-*, *::before, *::after { box-sizing: border-box; }
+/* 2. Global styles -------------------------------------------------------------- */
+html, body { 
+  margin: 0; 
+  padding: 0; 
+  font-family: var(--font-family); 
+  background: var(--bg); 
+  color: var(--text); 
+  line-height: 1.5; 
+} 
+*, *::before, *::after { box-sizing: border-box; } 
 
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
+a { color: var(--accent); text-decoration: none; } 
+a:hover { text-decoration: underline; } 
 
-/* 3. Navigation ----------------------------------------------------------- */
-.navbar {
+/* 3. Navigation -------------------------------------------------------------- */
+.navbar { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  padding: .75rem 1rem; 
+  background: var(--border); 
+} 
+.nav-left a { margin-right: 1rem; } 
+.theme-toggle { 
+  background: none; 
+  border: none; 
+  font-size: 1.2rem; 
+  cursor: pointer; 
+  color: var(--text); 
+} 
+
+/* 4. Container & layout ------------------------------------------------------- */
+.container { max-width: 960px; margin: 0 auto; padding: 1rem; } 
+
+/* 5. Flash messages ------------------------------------------------------------- */
+.flashes { margin-bottom: 1rem; } 
+.flash { padding: .75rem 1rem; margin-bottom: .5rem; border-radius: var(--border-radius); }
+.flash.success { background: var(--success); color: var(--bg); } 
+.flash.info { background: var(--accent); color: var(--bg); } 
+.flash.warning { background: var(--warning); color: var(--text); } 
+.flash.danger { background: var(--danger); color: var(--bg); } 
+
+/* 6. Buttons -------------------------------------------------------------- */
+.btn { 
+  display: inline-block; 
+  padding: .5rem 1rem; 
+  border: none; 
+  border-radius: var(--border-radius); 
+  background: var(--accent); 
+  color: var(--bg); 
+  cursor: pointer; 
+} 
+.btn:hover { opacity: .9; } 
+.btn.delete-btn { background: var(--danger); } 
+.btn.complete-btn { background: var(--success); } 
+.btn.remove-btn { background: var(--warning); } 
+
+/* 7. Forms -------------------------------------------------------------- */
+form .form-group { margin-bottom: .75rem; } 
+form .form-control { 
+  width: 100%; 
+  padding: .5rem; 
+  border: 1px solid var(--border); 
+  border-radius: var(--border-radius); 
+  background: var(--bg); 
+  color: var(--text); 
+} 
+
+/* 8. Monthly overview table ------------------------------------------------------- */
+.monthly-table { width: 100%; border-collapse: collapse; } 
+.monthly-table th, .monthly-table td { 
+  border: 1px solid var(--border); 
+  padding: .4rem 0.6rem; 
+  text-align: center; 
+  font-size: 0.9rem; 
+} 
+.monthly-table th { background: var(--border); font-weight: normal; } 
+.monthly-table .status.done { color: var(--success); } 
+.monthly-table .status.not-done { color: var(--danger); } 
+
+/* 9. Navigation arrows in month view ------------------------------------------ */
+.nav-arrows a { margin: 0 0.5rem; color: var(--accent); text-decoration: none; }
+.nav-arrows a:hover { text-decoration: underline; } 
+
+/* 10. Footer -------------------------------------------------------------- */
+footer { text-align: center; margin-top: 2rem; color: var(--border); font-size: .875rem; }
+
+/* 11. Todo List page styling ----------------------------------------------------- */
+.list-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: .75rem 1rem;
-  background: var(--border);
+  margin-bottom: 0.75rem;
 }
-.nav-left a { margin-right: 1rem; }
-.theme-toggle {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  color: var(--text);
+.list-item .btn {
+  margin-left: 0.5rem;
 }
-
-/* 4. Container & layout --------------------------------------------------- */
-.container { max-width: 960px; margin: 0 auto; padding: 1rem; }
-
-/* 5. Flash messages ------------------------------------------------------- */
-.flashes { margin-bottom: 1rem; }
-.flash { padding: .75rem 1rem; margin-bottom: .5rem; border-radius: var(--border-radius); }
-.flash.success { background: var(--success); color: var(--bg); }
-.flash.info    { background: var(--accent);  color: var(--bg); }
-.flash.warning { background: var(--warning); color: var(--text); }
-.flash.danger  { background: var(--danger);  color: var(--bg); }
-
-/* 6. Buttons -------------------------------------------------------------- */
-.btn {
-  display: inline-block;
-  padding: .5rem 1rem;
-  border: none;
-  border-radius: var(--border-radius);
-  background: var(--accent);
-  color: var(--bg);
-  cursor: pointer;
-}
-.btn:hover { opacity: .9; }
-.btn.delete-btn { background: var(--danger); }
-.btn.complete-btn { background: var(--success); }
-.btn.remove-btn { background: var(--warning); }
-
-/* 7. Forms --------------------------------------------------------------- */
-form .form-group { margin-bottom: .75rem; }
-form .form-control {
-  width: 100%;
-  padding: .5rem;
-  border: 1px solid var(--border);
-  border-radius: var(--border-radius);
-  background: var(--bg);
-  color: var(--text);
-}
-
-/* 8. Monthly overview table --------------------------------------------- */
-.monthly-table { width: 100%; border-collapse: collapse; }
-.monthly-table th, .monthly-table td {
-  border: 1px solid var(--border);
-  padding: .4rem 0.6rem;
-  text-align: center;
-  font-size: 0.9rem;
-}
-.monthly-table th { background: var(--border); font-weight: normal; }
-.monthly-table .status.done { color: var(--success); }
-.monthly-table .status.not-done { color: var(--danger); }
-
-/* 9. Navigation arrows in month view ------------------------------------- */
-.nav-arrows a { margin: 0 0.5rem; color: var(--accent); text-decoration: none; }
-.nav-arrows a:hover { text-decoration: underline; }
-
-/* 10. Footer ------------------------------------------------------------- */
-footer { text-align: center; margin-top: 2rem; color: var(--border); font-size: .875rem; }

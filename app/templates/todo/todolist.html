@@ -27,13 +27,13 @@
     <div class="list-item">
       <span>{{ item.name }}</span>
       <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
-        {{ csrf_token() }}
+		<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" value="complete">
         <input type="hidden" name="item_id" value="{{ item.id }}">
         <button type="submit" class="btn complete-btn">Complete</button>
       </form>
       <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
-        {{ csrf_token() }}
+		<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" value="remove">
         <input type="hidden" name="item_id" value="{{ item.id }}">
         <button type="submit" class="btn delete-btn">Remove</button>
@@ -48,7 +48,7 @@
     <div class="list-item {{ status_class }}">
       <span>{{ item.name }} – Due: {{ due_display }}</span>
       <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
-        {{ csrf_token() }}
+		<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" value="complete">
         <input type="hidden" name="item_id" value="{{ item.id }}">
         <button type="submit" class="btn complete-btn">Complete</button>
@@ -69,7 +69,7 @@
     <div class="list-item">
       <span>{{ item.name }} – Completed at {{ item.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span>
       <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
-        {{ csrf_token() }}
+		<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" value="remove">
         <input type="hidden" name="item_id" value="{{ item.id }}">
         <button type="submit" class="btn delete-btn">Remove</button>

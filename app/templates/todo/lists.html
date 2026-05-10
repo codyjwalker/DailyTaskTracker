@@ -1,20 +1,23 @@
 {% extends "base.html" %}
+
 {% block title %}To‑Do Lists{% endblock %}
+
 {% block content %}
+<div class="container">
   <h2>To‑Do Lists</h2>
-  <p><a href="{{ url_for('main.monthly') }}">Back to Monthly Overview</a></p>
+  <a href="{{ url_for('main.monthly') }}" class="btn">Back to Monthly Overview</a>
 
   <h3>Existing Lists</h3>
   {% if todo_lists %}
-    <ul class="list-group">
-      {% for lst in todo_lists %}
-        <li class="list-item">
-          <span>
-            <a href="{{ url_for('main.todolist', list_id=lst.id) }}">{{ lst.name }}</a></span>
-          <a href="{{ url_for('main.confirm_delete_list', list_id=lst.id) }}" class="btn delete-btn">Delete</a>
-        </li>
-      {% endfor %}
-    </ul>
+    {% for lst in todo_lists %}
+      <div class="list-item">
+        <a href="{{ url_for('main.todolist', list_id=lst.id) }}" class="btn">{{ lst.name }}</a>
+        <form method="post" action="{{ url_for('main.confirm_delete_list', list_id=lst.id) }}" style="display:inline;">
+			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn delete-btn">Delete</button>
+        </form>
+      </div>
+    {% endfor %}
   {% else %}
     <p>No to‑do lists yet.</p>
   {% endif %}
@@ -22,11 +25,11 @@
   <h3>Create New List</h3>
   <form method="post" action="{{ url_for('main.todolists') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input type="hidden" name="action" value="create">
     <div class="form-group">
-      <label for="name">List name:</label>
-      <input type="text" id="name" name="name" required class="form-control">
+      <label for="list_name">List name:</label>
+      <input type="text" id="list_name" name="name" class="form-control" required>
     </div>
     <button type="submit" class="btn">Create List</button>
   </form>
+</div>
 {% endblock %}

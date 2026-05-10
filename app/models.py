@@ -1,12 +1,10 @@
 # app/models.py
 """SQLAlchemy ORM models for the Personal Task Tracker."""
-
-from datetime import datetime
+from datetime import datetime, date
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from . import db, login_manager
-
 
 class User(UserMixin, db.Model):
     """A registered user."""
@@ -29,11 +27,9 @@ class User(UserMixin, db.Model):
     def check_password(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
 
-
 @login_manager.user_loader
 def load_user(user_id: str):
     return User.query.get(int(user_id))
-
 
 class TaskList(db.Model):
     """Defines the list of task names for a user."""
@@ -43,7 +39,8 @@ class TaskList(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     name = db.Column(db.String(200), nullable=False)
     position = db.Column(db.Integer, nullable=False, default=0)
-
+    start_date = db.Column(db.Date, nullable=False)          # <‑‑ new
+    end_date = db.Column(db.Date, nullable=True)            # <‑‑ new
 
 class DailyTask(db.Model):
     """Stores the completion status of a task on a particular date."""
@@ -54,7 +51,6 @@ class DailyTask(db.Model):
     date = db.Column(db.Date, nullable=False)
     task_id = db.Column(db.Integer, db.ForeignKey('task_lists.id'), nullable=False)
     status = db.Column(db.Boolean, default=False)
-
 
 class TodoList(db.Model):
     """Represents a named to‑do list for a user."""
@@ -72,7 +68,6 @@ class TodoList(db.Model):
         cascade='all, delete-orphan',
     )
 
-
 class TodoItem(db.Model):
     """A to‑do item that can be scheduled and marked completed."""
     __tablename__ = 'todo_items'
@@ -82,5 +77,5 @@ class TodoItem(db.Model):
     todo_list_id = db.Column(db.Integer, db.ForeignKey('todo_lists.id'), nullable=False)
     name = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Boolean, default=False)
-    timestamp = db.Column(db.DateTime)          # when the item was completed
-    due_date = db.Column(db.DateTime)           # optional due date
+    timestamp = db.Column(db.DateTime)  # when the item was completed
+    due_date = db.Column(db.DateTime)  # optional due date

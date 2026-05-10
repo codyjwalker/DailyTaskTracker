@@ -120,3 +120,21 @@ footer { text-align: center; margin-top: 2rem; color: var(--border); font-size: 
 .list-item .btn {
   margin-left: 0.5rem;
 }
+
+/* 12. Task controls layout */
+.task-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.task-section {
+  flex: 1 1 30%;
+  min-width: 200px;
+  background: var(--border);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+}
+.task-section h3 {
+  margin-top: 0;
+}

@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Monthly Overview - {{ month_name }} {{ year }}{% endblock %}
 
-{# ---------- Override the wrapper so the month can span the full width ---------- #}
+{# Override the wrapper so the month can span the full width #}
 {% block wrapper %}
   {% block content %}
     <h2>{{ month_name }} {{ year }}</h2>
 
     <div class="nav-arrows">
-      <a href="{{ url_for('main.monthly', month=prev_month, year=prev_year) }}">&larr; Previous Month</a>
-      <a href="{{ url_for('main.monthly', month=next_month, year=next_year) }}">Next Month &rarr;</a>
+      <a href="{{ url_for('main.monthly', month=prev_month, year=prev_year) }}">← Previous Month</a>
+      <a href="{{ url_for('main.monthly', month=next_month, year=next_year) }}">Next Month →</a>
     </div>
 
     <table class="monthly-table">
@@ -39,18 +39,62 @@
       </tbody>
     </table>
 
-    <h3>Add a new task</h3>
-    <form method="post" action="{{ url_for('main.add_task') }}">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <div class="form-group">
-        <label for="name">Task name:</label>
-        <input type="text" id="name" name="name" required class="form-control">
+    <div class="task-controls">
+      <div class="task-section">
+        <h3>Delete Task</h3>
+        <form method="post" action="{{ url_for('main.delete_task') }}"
+              onsubmit="return confirm('Are you sure you want to delete this task?');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="month" value="{{ month }}">
+          <input type="hidden" name="year" value="{{ year }}">
+          <div class="form-group">
+            <label for="delete-task-select">Task:</label>
+            <select id="delete-task-select" name="task_name" required class="form-control">
+              {% for task in tasks %}
+              <option value="{{ task }}">{{ task }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn delete-btn">Delete Task</button>
+        </form>
       </div>
-      <div class="form-group">
-        <label for="position">Position (row number):</label>
-        <input type="number" id="position" name="position" class="form-control">
+
+      <div class="task-section">
+        <h3>Add a new task</h3>
+        <form method="post" action="{{ url_for('main.add_task') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="month" value="{{ month }}">
+          <input type="hidden" name="year" value="{{ year }}">
+          <div class="form-group">
+            <label for="name">Task name:</label>
+            <input type="text" id="name" name="name" required class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="position">Position (row number):</label>
+            <input type="number" id="position" name="position" class="form-control">
+          </div>
+          <button type="submit" class="btn">Add Task</button>
+        </form>
       </div>
-      <button type="submit" class="btn">Add Task</button>
-    </form>
+
+      <div class="task-section">
+        <h3>Move Task</h3>
+        <form method="post" action="{{ url_for('main.move_task') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="month" value="{{ month }}">
+          <input type="hidden" name="year" value="{{ year }}">
+          <div class="form-group">
+            <label for="move-task-select">Task:</label>
+            <select id="move-task-select" name="task_name" required class="form-control">
+              {% for task in tasks %}
+              <option value="{{ task }}">{{ task }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" name="direction" value="up" class="btn">Move Up</button>
+          <button type="submit" name="direction" value="down" class="btn">Move Down</button>
+        </form>
+      </div>
+    </div>
   {% endblock %}
 {% endblock %}

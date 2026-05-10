@@ -1,6 +1,5 @@
 # app/helpers.py
 """Utility functions used across the application."""
-
 from datetime import date, timedelta
 from . import db
 from .models import TaskList, DailyTask
@@ -34,8 +33,9 @@ DEFAULT_TASK_NAMES = [
 
 def init_user_task_list(user):
     """Create default TaskList entries for a new user."""
+    first_day = date.today().replace(day=1)          # <‑‑ new
     for idx, name in enumerate(DEFAULT_TASK_NAMES, start=1):
-        task = TaskList(user_id=user.id, name=name, position=idx)
+        task = TaskList(user_id=user.id, name=name, position=idx, start_date=first_day)
         db.session.add(task)
     db.session.commit()
 
@@ -49,8 +49,14 @@ def get_monthly_view(user, year, month):
     )
     num_days = last_day.day
 
-    # Ordered list of tasks for this user
-    tasks = TaskList.query.filter_by(user_id=user.id).order_by(TaskList.position).all()
+    # Ordered list of tasks for this user that are active for the month
+    tasks = (
+        TaskList.query.filter_by(user_id=user.id)
+        .filter(TaskList.start_date <= first_day)
+        .filter((TaskList.end_date == None) | (TaskList.end_date > first_day))
+        .order_by(TaskList.position)
+        .all()
+    )
 
     # Ensure DailyTask rows exist for every (date, task)
     for day in range(1, num_days + 1):
@@ -60,10 +66,13 @@ def get_monthly_view(user, year, month):
                 user_id=user.id, date=day_date, task_id=task.id
             ).first():
                 dt = DailyTask(
-                    user_id=user.id, date=day_date, task_id=task.id, status=False
+                    user_id=user.id,
+                    date=day_date,
+                    task_id=task.id,
+                    status=False,
                 )
                 db.session.add(dt)
-    db.session.commit()
+        db.session.commit()
 
     days = []
     for day in range(1, num_days + 1):
@@ -75,12 +84,14 @@ def get_monthly_view(user, year, month):
             task_name = TaskList.query.get(dt.task_id).name
             status_map[task_name] = dt.status
 
-        days.append({
-            'date': day_str,
-            'day': day,
-            'weekday': day_date.strftime('%a'),
-            'statuses': status_map,
-        })
+        days.append(
+            {
+                "date": day_str,
+                "day": day,
+                "weekday": day_date.strftime("%a"),
+                "statuses": status_map,
+            }
+        )
 
     task_names = [t.name for t in tasks]
     return days, task_names
@@ -88,7 +99,13 @@ def get_monthly_view(user, year, month):
 def get_daily_status(user, date_str):
     """Return status dict for a single date."""
     day_obj = date.fromisoformat(date_str)
-    tasks = TaskList.query.filter_by(user_id=user.id).order_by(TaskList.position).all()
+    tasks = (
+        TaskList.query.filter_by(user_id=user.id)
+        .filter(TaskList.start_date <= day_obj)
+        .filter((TaskList.end_date == None) | (TaskList.end_date > day_obj))
+        .order_by(TaskList.position)
+        .all()
+    )
     status_map = {t.name: False for t in tasks}
     for dt in DailyTask.query.filter_by(user_id=user.id, date=day_obj).all():
         task_name = TaskList.query.get(dt.task_id).name
@@ -106,7 +123,9 @@ def update_daily_status(user, date_str, statuses):
             user_id=user.id, date=day_obj, task_id=task.id
         ).first()
         if not dt:
-            dt = DailyTask(user_id=user.id, date=day_obj, task_id=task.id, status=done)
+            dt = DailyTask(
+                user_id=user.id, date=day_obj, task_id=task.id, status=done
+            )
             db.session.add(dt)
         else:
             dt.status = done

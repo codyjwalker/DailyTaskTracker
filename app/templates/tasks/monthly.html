@@ -1,60 +1,56 @@
-<!-- FILE:  app/templates/monthly.html -->
-
 {% extends "base.html" %}
 {% block title %}Monthly Overview - {{ month_name }} {{ year }}{% endblock %}
-{% block content %}
-<div class="month-navigation">
-    <a href="{{ url_for('main.monthly', month=prev_month, year=prev_year) }}"
-       class="nav-btn nav-prev">← Previous Month</a>
+
+{# ---------- Override the wrapper so the month can span the full width ---------- #}
+{% block wrapper %}
+  {% block content %}
     <h2>{{ month_name }} {{ year }}</h2>
-    <a href="{{ url_for('main.monthly', month=next_month, year=next_year) }}"
-       class="nav-btn nav-next">Next Month →</a>
-</div>
 
-<table class="calendar">
-    <thead>
+    <div class="nav-arrows">
+      <a href="{{ url_for('main.monthly', month=prev_month, year=prev_year) }}">&larr; Previous Month</a>
+      <a href="{{ url_for('main.monthly', month=next_month, year=next_year) }}">Next Month &rarr;</a>
+    </div>
+
+    <table class="monthly-table">
+      <thead>
         <tr>
-            <th>Task</th>
-            {% for day in days %}
+          <th>Task</th>
+          {% for day in days %}
             <th>
-                <a href="{{ url_for('main.daily', date=day.date) }}">
-                    {{ day.day }}<br>{{ day.weekday }}
-                </a>
+              <a href="{{ url_for('main.daily', date=day.date) }}">
+                {{ day.day }}<br>{{ day.weekday }}
+              </a>
             </th>
-            {% endfor %}
+          {% endfor %}
         </tr>
-    </thead>
-    <tbody>
+      </thead>
+      <tbody>
         {% for task in tasks %}
-        <tr>
-            <td class="task-name">{{ task }}</td>
+          <tr>
+            <td>{{ task }}</td>
             {% for day in days %}
-                {% set done = day.statuses[task] %}
-                <td class="task-cell {% if done %}completed{% else %}incomplete{% endif %}">
-                    {% if done %}&#10004;{% else %}&#10006;{% endif %}
-                </td>
+              {% set done = day.statuses[task] %}
+              <td class="status {% if done %}done{% else %}not-done{% endif %}">
+                {% if done %}✔{% else %}✖{% endif %}
+              </td>
             {% endfor %}
-        </tr>
+          </tr>
         {% endfor %}
-    </tbody>
-</table>
+      </tbody>
+    </table>
 
-<div class="task-form">
     <h3>Add a new task</h3>
     <form method="post" action="{{ url_for('main.add_task') }}">
-        <!-- CSRF hidden field -->
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <label>
-            Task name:
-            <input type="text" name="name" required>
-        </label>
-        <label>
-            Position (row number):
-            <input type="number" name="position" min="1" step="1">
-        </label>
-        <button type="submit">Add Task</button>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-group">
+        <label for="name">Task name:</label>
+        <input type="text" id="name" name="name" required class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="position">Position (row number):</label>
+        <input type="number" id="position" name="position" class="form-control">
+      </div>
+      <button type="submit" class="btn">Add Task</button>
     </form>
-</div>
+  {% endblock %}
 {% endblock %}
-
-<!-- END:  app/templates/monthly.html -->

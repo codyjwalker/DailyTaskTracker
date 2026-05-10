@@ -1,6 +1,5 @@
 # app/routes/todo.py
 """Routes for the To‑Do list."""
-
 from datetime import datetime, timedelta
 from flask import (
     render_template,
@@ -15,8 +14,7 @@ from . import bp
 from .. import db
 from ..models import TodoList, TodoItem
 
-
-# ---------- 1.  Lists overview (create / delete) ----------
+# ---------- 1. Lists overview (create / delete) ----------
 @bp.route('/todolists', methods=['GET', 'POST'])
 @login_required
 def todolists():
@@ -41,8 +39,7 @@ def todolists():
     )
     return render_template('todo/lists.html', todo_lists=todo_lists)
 
-
-# ---------- 2.  Delete‑confirmation flow ----------
+# ---------- 2. Delete‑confirmation flow ----------
 @bp.route('/todolists/delete/<int:list_id>', methods=['GET', 'POST'])
 @login_required
 def confirm_delete_list(list_id):
@@ -58,8 +55,7 @@ def confirm_delete_list(list_id):
         return redirect(url_for('main.todolists'))
     return render_template('todo/confirm_delete.html', todo_list=todo_list)
 
-
-# ---------- 3.  Individual to‑do list (add / complete / remove) ----------
+# ---------- 3. Individual to‑do list (add / complete / remove) ----------
 @bp.route('/todolist/<int:list_id>', methods=['GET', 'POST'])
 @login_required
 def todolist(list_id):

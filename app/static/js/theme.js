@@ -1,29 +1,28 @@
-// app/static/js/theme.js
-(() => {
-    const themeKey = 'theme';
-    const body = document.body;
-    const toggle = document.getElementById('theme-toggle');
-    const icon  = document.getElementById('theme-label');
+/* app/static/js/theme.js */
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleBtn = document.getElementById('theme-toggle');
+  const root = document.documentElement;
 
-    // Apply the theme (sets data-theme, checkbox state, and icon)
-    const applyTheme = theme => {
-        body.setAttribute('data-theme', theme);
-        if (toggle) toggle.checked = (theme === 'dark');
-        if (icon)   icon.textContent = theme === 'dark' ? '🌙' : '☀️';
-    };
+  const setTheme = (theme) => {
+    root.setAttribute('data-theme', theme);
+    toggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  };
 
-    // Initialise theme on page load
-    const stored = localStorage.getItem(themeKey);
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    let theme = stored ?? (prefersDark ? 'dark' : 'light');
-    applyTheme(theme);
+  const storedTheme = localStorage.getItem('theme');
+  if (storedTheme) {
+    setTheme(storedTheme);
+  } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    setTheme('dark');
+  } else {
+    setTheme('light');
+  }
 
-    // Listen for toggle changes
-    if (toggle) {
-        toggle.addEventListener('change', () => {
-            const newTheme = toggle.checked ? 'dark' : 'light';
-            localStorage.setItem(themeKey, newTheme);
-            applyTheme(newTheme);
-        });
-    }
-})();
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const current = root.getAttribute('data-theme');
+      const newTheme = current === 'light' ? 'dark' : 'light';
+      setTheme(newTheme);
+      localStorage.setItem('theme', newTheme);
+    });
+  }
+});

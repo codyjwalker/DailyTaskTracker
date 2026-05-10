@@ -84,8 +84,8 @@ class TodoItem(db.Model):
     # Sub‑tasks relationship – a todo item can have many sub‑tasks
     subtasks = db.relationship(
         'SubTask',
-        backref='todo_item',
-        lazy='dynamic',
+        backref='parent',
+        lazy='select',
         cascade='all, delete-orphan',
     )
 

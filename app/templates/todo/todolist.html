@@ -6,7 +6,7 @@
 
   <h3>Add new item</h3>
   <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}">
-    {{ csrf_token() }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="form-group">
       <label for="name">Item name:</label>
       <input type="text" id="name" name="name" required class="form-control">

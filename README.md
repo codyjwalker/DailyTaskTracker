@@ -14,14 +14,9 @@ A lightweight local web application for tracking daily tasks with a monthly over
 ## Quick Start
 
 ```bash
-<<<<<<< HEAD
-# Clone the repository or copy the folder structure locally
-# cd path/to/personal-task-tracker
-=======
 # Clone the repo
 git clone <repo-url>
 cd personal-task-tracker
->>>>>>> 8b13346 (Clean up & optimize code, rename & reorganize file structure, extract helpers into common file, remove duplication.)
 
 # Optional: create a virtual environment
 python -m venv venv
@@ -35,17 +30,3 @@ echo 'YOUR_RANDOM_KEY' > secret_key.txt
 
 # Run locally
 python run.py
-
-```
-
-### Docker Startup
-
-```bash
-docker compose up --build -d
-```
-
-# Docker Shutdown
-
-```bash
-docker compose down
-```

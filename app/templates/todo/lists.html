@@ -1,35 +1,35 @@
 {% extends "base.html" %}
-
 {% block title %}To‑Do Lists{% endblock %}
 
 {% block content %}
 <div class="container">
-  <h2>To‑Do Lists</h2>
-  <a href="{{ url_for('main.monthly') }}" class="btn">Back to Monthly Overview</a>
+    <h1>To‑Do Lists</h1>
+    <p><a href="{{ url_for('main.monthly') }}">Back to Monthly Overview</a></p>
 
-  <h3>Existing Lists</h3>
-  {% if todo_lists %}
-    {% for lst in todo_lists %}
-      <div class="list-item">
-        <a href="{{ url_for('main.todolist', list_id=lst.id) }}" class="btn">{{ lst.name }}</a>
-        <form method="post" action="{{ url_for('main.confirm_delete_list', list_id=lst.id) }}" style="display:inline;">
-			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="btn delete-btn">Delete</button>
-        </form>
-      </div>
-    {% endfor %}
-  {% else %}
-    <p>No to‑do lists yet.</p>
-  {% endif %}
+    <h2>Existing Lists</h2>
+    {% if todo_lists %}
+        <ul class="list-unstyled">
+        {% for lst in todo_lists %}
+            <li class="list-item">
+                <a href="{{ url_for('main.todolist', list_id=lst.id) }}">{{ lst.name }}</a>
+                <a href="{{ url_for('main.confirm_delete_list', list_id=lst.id) }}"
+                   class="btn delete-btn btn-sm">Delete</a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No to‑do lists yet.</p>
+    {% endif %}
 
-  <h3>Create New List</h3>
-  <form method="post" action="{{ url_for('main.todolists') }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <div class="form-group">
-      <label for="list_name">List name:</label>
-      <input type="text" id="list_name" name="name" class="form-control" required>
-    </div>
-    <button type="submit" class="btn">Create List</button>
-  </form>
+    <h2>Create New List</h2>
+    <form action="{{ url_for('main.todolists') }}" method="post" class="mt-3">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="create">
+        <div class="form-group">
+            <label for="list-name">List name:</label>
+            <input type="text" id="list-name" name="name" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Create List</button>
+    </form>
 </div>
 {% endblock %}

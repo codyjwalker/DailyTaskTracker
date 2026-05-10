@@ -54,7 +54,7 @@
         <button type="submit" class="btn complete-btn">Complete</button>
       </form>
       <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
-        {{ csrf_token() }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" value="remove">
         <input type="hidden" name="item_id" value="{{ item.id }}">
         <button type="submit" class="btn delete-btn">Remove</button>

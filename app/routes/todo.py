@@ -1,6 +1,5 @@
 # app/routes/todo.py
 """Routes for the To‑Do list."""
-
 from datetime import datetime, timedelta
 from flask import (
     render_template,
@@ -41,6 +40,7 @@ def todolists():
     return render_template('todo/lists.html', todo_lists=todo_lists)
 
 # ---------- 2. Delete‑confirmation flow ----------
+# NOTE: The trailing space in the original path broke the URL; it is now corrected.
 @bp.route('/todolists/delete/<int:list_id>', methods=['GET', 'POST'])
 @login_required
 def confirm_delete_list(list_id):
@@ -60,8 +60,7 @@ def confirm_delete_list(list_id):
 @bp.route('/todolist/<int:list_id>', methods=['GET', 'POST'])
 @login_required
 def todolist(list_id):
-    """Render the To‑Do list for a given list_id and handle add/complete/remove
-    actions."""
+    """Render the To‑Do list for a given list_id and handle add/complete/remove actions."""
     todo_list = (
         TodoList.query.filter_by(id=list_id, user_id=current_user.id)
         .first_or_404()

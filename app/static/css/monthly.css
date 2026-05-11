@@ -3,6 +3,24 @@
 /* ======================================================
          Monthly Overview – Task Control Sections
    ====================================================== */
+   
+/* Monthly overview table ---------------------------------------- */
+.monthly-table { width: 100%; border-collapse: collapse; } 
+.monthly-table th, .monthly-table td { 
+    border: 1px solid var(--border); 
+    padding: .4rem 0.6rem; 
+    text-align: center; 
+} 
+.monthly-table th { background: var(--border); font-weight: normal; } 
+.monthly-table .status.done { color: var(--success); } 
+.monthly-table .status.not-done { color: var(--danger); } 
+
+/* Navigation arrows in month view ------------------------------ */
+.nav-arrows a { margin: 0 0.5rem; color: var(--accent); text-decoration: none; }
+.nav-arrows a:hover { text-decoration: underline; } 
+
+/* Footer -------------------------------------------------------- */
+footer { text-align: center; margin-top: 2rem; color: var(--border); font-size: .875rem; } 
 
 /* The container that holds the three sections */
 .task-controls {

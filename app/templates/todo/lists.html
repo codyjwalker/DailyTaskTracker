@@ -2,6 +2,7 @@
 {% block title %}To‑Do Lists{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/todo_list_manager.css') }}">
 <div class="container">
     <h1>To‑Do Lists</h1>
     {% if todo_lists %}

@@ -1,0 +1,59 @@
+/* app/static/css/todo_list_manager.css */
+
+/* Wrapper for the entire page – keeps it centered */
+.todo-lists-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Individual list card – flex layout so the delete button is on the far right */
+.todo-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .75rem .5rem;
+  margin-bottom: .5rem;
+  background: var(--border);          /* light grey – same as other cards */
+  border-radius: var(--border-radius);
+  box-sizing: border-box;
+}
+
+/* Delete button – uses the same colour rules as the rest of the app */
+.btn.delete-btn {
+  background: var(--danger);          /* red background */
+  color: var(--bg);                   /* white text */
+  padding: .35rem .75rem;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+}
+.btn.delete-btn:hover { opacity: .9; }
+
+/* Create‑list form – input is capped at 300 px, button follows app’s button style */
+.todo-create-form {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.todo-create-form input[type="text"] {
+  max-width: 300px;
+  width: 100%;
+  padding: .5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  background: var(--bg);
+  color: var(--text);
+  margin-right: .75rem;
+}
+
+.todo-create-form button {
+  padding: .5rem 1rem;
+  border: none;
+  border-radius: var(--border-radius);
+  background: var(--accent);
+  color: var(--bg);
+  cursor: pointer;
+}
+.todo-create-form button:hover { opacity: .9; }

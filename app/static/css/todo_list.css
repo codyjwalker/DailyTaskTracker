@@ -1,0 +1,98 @@
+
+/* To‑Do List page styling -------------------------------------- */
+.list-group { 
+    list-style: none; 
+    padding: 0; 
+    margin: 0; 
+} 
+.list-group-item { 
+    display: block;                     /* changed from flex to keep width  */
+    padding: .5rem .75rem; 
+    border: 1px solid var(--border); 
+    border-radius: var(--border-radius); 
+    margin-bottom: .5rem; 
+} 
+
+/* Helper that keeps the header + control buttons on one line */
+.item-header-row { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: .5rem; 
+    margin-right: .5rem; 
+} 
+
+/* Sub‑tasks styling -------------------------------------------- */
+.subtasks { 
+    margin-left: 1.5rem;                /* indent nested sub‑tasks */ 
+} 
+.subtask { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: .25rem .5rem; 
+    margin-bottom: .25rem; 
+    margin-top: .25rem; 
+    background: var(--border); 
+    border-radius: var(--border-radius); 
+    border: 1px solid var(--border);   /* border around each sub‑task */ 
+} 
+.subtask.completed { 
+    background: var(--success); 
+    color: var(--bg); 
+} 
+.subtask-due { 
+    margin-left: .5rem; 
+    font-size: .9rem; 
+    color: var(--warning); 
+} 
+.subtask-completed-note { 
+    margin-left: .5rem; 
+    font-size: .85rem; 
+    color: var(--text); 
+    opacity: .8; 
+}
+
+/* Completed‑Task highlight ------------------------------------- */
+.completed-task {
+    background: var(--success);   /* green background for completed tasks */
+    color: var(--bg);             /* white text on green */
+}
+
+/* Border around the sub‑task list when the parent task is completed */
+.completed-task .subtasks {
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+/* Task‑Overview grid ------------------------------------------- */
+.grid-row { display: flex; }
+.grid-cell {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  margin: 1px;
+  box-sizing: border-box;
+}
+.grid-cell.green { background: var(--success); color: var(--bg); }
+.grid-cell.red   { background: var(--danger); color: var(--bg); }
+.grid-cell.blank { background: var(--bg); color: var(--text); }
+
+.grid-cell .date-month,
+.grid-cell .date-day {
+  position: absolute;
+  font-size: 1.1rem;
+}
+
+.grid-cell .date-slash{
+  position: absolute;
+  font-size: 1.6rem;
+}
+.grid-cell .date-month { top: 6px; left: 6px; }
+.grid-cell .date-slash { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.grid-cell .date-day  { bottom: 6px; right: 6px; }
+ 

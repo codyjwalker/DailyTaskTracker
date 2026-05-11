@@ -64,6 +64,8 @@ app/__init__.py
     – Creates the database tables on startup (`db.create_all()`).
   • Returns the Flask app instance.
   • No changes were made to this file for the Sub‑Task feature.
+  • New context processor `inject_todo_lists` now supplies `todo_lists` for all templates.
+
 
 --------------------------------------------------------------------
 app/config.py

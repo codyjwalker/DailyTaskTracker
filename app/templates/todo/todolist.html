@@ -1,275 +1,254 @@
+{# app/templates/todo/todolist.html #}
 {% extends "base.html" %}
 {% block title %}{{ todo_list.name }}{% endblock %}
 {% block content %}
-<h2>{{ todo_list.name }}</h2>
-<p><a href="{{ url_for('main.todolists') }}">Back to Lists</a></p>
+<div class="container">
 
-<h3>Add new item</h3>
-<form method="post"
-      action="{{ url_for('main.todolist', list_id=todo_list.id) }}">
+  <h2>{{ todo_list.name }}</h2>
+  <p><a href="{{ url_for('main.todolists') }}">Back to Lists</a></p>
+
+  {# ---- Add a new top‑level item ---------------------------------- #}
+  <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}">
     <input type="hidden" name="action" value="add">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="form-group">
-        <label for="new-item-name">Item name:</label>
-        <input type="text" id="new-item-name" name="name"
-               class="form-control" required>
+      <label for="name_{{ todo_list.id }}">Item name:</label>
+      <input type="text" id="name_{{ todo_list.id }}" name="name" class="form-control" required>
     </div>
     <div class="form-group">
-        <label>
-            <input type="checkbox" name="due_checkbox"
-                   class="due-checkbox" data-target="due-container">
-            Due date:
-        </label>
-        <div id="due-container" style="display:none;">
-            <input type="datetime-local" name="due_date"
-                   class="form-control">
-        </div>
+      <label>
+        <input type="checkbox" name="due_checkbox" class="due-checkbox" data-target="due_container_{{ todo_list.id }}">
+        Due date
+      </label>
+      <div id="due_container_{{ todo_list.id }}" style="display:none;">
+        <input type="datetime-local" name="due_date" class="form-control">
+      </div>
     </div>
     <button type="submit" class="btn">Add</button>
-</form>
+  </form>
 
-<h3>Pending Items</h3>
-<ul class="list-group">
-{% for item in pending %}
-    <li class="list-group-item">
-        <div class="item-header-row">
-            <div class="item-header">
-                <strong>{{ item.name }}</strong>
-            </div>
-            <div class="task-controls">
-                <form method="post"
-                      action="{{ url_for('main.todolist', list_id=todo_list.id) }}">
-                    <input type="hidden" name="action" value="complete">
-                    <input type="hidden" name="item_id" value="{{ item.id }}">
-                    <input type="hidden" name="csrf_token"
-                           value="{{ csrf_token() }}">
+  <hr>
+
+  {# ---- Pending Items ---------------------------------------------- #}
+  <h3>Pending Items</h3>
+  {% if pending %}
+    {% for item in pending %}
+      <div class="list-item">
+        <div class="flex-grow"><strong>{{ item.name }}</strong></div>
+        <div class="task-controls">
+          <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
+            <input type="hidden" name="action" value="complete">
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn complete-btn">Complete</button>
+          </form>
+          <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
+            <input type="hidden" name="action" value="remove">
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn delete-btn">Remove</button>
+          </form>
+        </div>
+      </div>
+
+      {% if item.subtasks %}
+        <div class="subtasks">
+          {% for sub in item.subtasks %}
+            <div class="subtask{% if sub.completed %} completed{% endif %}">
+              <div class="flex-grow">
+                <strong>{{ sub.name }}</strong>
+                {% if sub.due_date %}
+                  – Due: {{ sub.due_date.strftime('%Y-%m-%d %H:%M') }}
+                {% endif %}
+              </div>
+              <div class="task-controls">
+                {% if sub.completed %}
+                  <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
+                    <input type="hidden" name="action" value="undo_sub">
+                    <input type="hidden" name="subtask_id" value="{{ sub.id }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn">Undo</button>
+                  </form>
+                {% else %}
+                  <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
+                    <input type="hidden" name="action" value="complete_sub">
+                    <input type="hidden" name="subtask_id" value="{{ sub.id }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn complete-btn">Complete</button>
+                  </form>
+                {% endif %}
+                <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
+                  <input type="hidden" name="action" value="remove_sub">
+                  <input type="hidden" name="subtask_id" value="{{ sub.id }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn delete-btn">Remove</button>
                 </form>
-                <form method="post"
-                      action="{{ url_for('main.todolist', list_id=todo_list.id) }}">
-                    <input type="hidden" name="action" value="remove">
-                    <input type="hidden" name="item_id" value="{{ item.id }}">
-                    <input type="hidden" name="csrf_token"
-                           value="{{ csrf_token() }}">
-                    <button type="submit" class="btn delete-btn">Remove</button>
-                </form>
+              </div>
             </div>
+          {% endfor %}
         </div>
+      {% endif %}
 
-        {% if item.subtasks %}
-        <ul class="subtasks">
-            {% for sub in item.subtasks %}
-            <li class="subtask{% if sub.completed %} completed{% endif %}">
-                <div class="subtask-info">
-                    <span>{{ sub.name }}</span>
-                    {% if sub.due_date %}
-                    <span class="subtask-due">– Due: {{ sub.due_date.strftime('%Y-%m-%d %H:%M') }}</span>
-                    {% endif %}
-                    {% if sub.completed %}
-                    <span class="subtask-completed-note">Completed</span>
-                    {% endif %}
-                </div>
-                <div class="task-controls">
-                    {% if not sub.completed %}
-                    <form method="post"
-                          action="{{ url_for('main.todolist', list_id=todo_list.id) }}">
-                        <input type="hidden" name="action" value="complete_sub">
-                        <input type="hidden" name="subtask_id" value="{{ sub.id }}">
-                        <input type="hidden" name="csrf_token"
-                               value="{{ csrf_token() }}">
-                        <button type="submit" class="btn complete-btn">Complete</button>
-                    </form>
-                    {% endif %}
-                    <form method="post"
-                          action="{{ url_for('main.todolist', list_id=todo_list.id) }}">
-                        <input type="hidden" name="action" value="remove_sub">
-                        <input type="hidden" name="subtask_id" value="{{ sub.id }}">
-                        <input type="hidden" name="csrf_token"
-                               value="{{ csrf_token() }}">
-                        <button type="submit" class="btn delete-btn">Remove</button>
-                    </form>
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
-        {% endif %}
+      {# ---- Sub‑task form for this item ------------------------------- #}
+      <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}">
+        <input type="hidden" name="action" value="add_sub">
+        <input type="hidden" name="parent_id" value="{{ item.id }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+          <label for="subtask_name_{{ item.id }}">Sub‑Task name:</label>
+          <input type="text" id="subtask_name_{{ item.id }}" name="subtask_name" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" name="sub_due_checkbox" class="due-checkbox" data-target="sub_due_container_{{ item.id }}">
+            Due date
+          </label>
+          <div id="sub_due_container_{{ item.id }}" style="display:none;">
+            <input type="datetime-local" name="sub_due_date" class="form-control">
+          </div>
+        </div>
+        <button type="submit" class="btn">Add Sub‑Task</button>
+      </form>
+      <hr>
+    {% endfor %}
+  {% else %}
+    <p>No pending items.</p>
+  {% endif %}
 
-        <!-- Sub‑task creation form – appears under the sub‑task list -->
-        <form method="post"
-              action="{{ url_for('main.todolist', list_id=todo_list.id) }}"
-              class="add-subtask-form">
-            <input type="hidden" name="action" value="add_sub">
-            <input type="hidden" name="parent_id" value="{{ item.id }}">
-            <input type="hidden" name="csrf_token"
-                   value="{{ csrf_token() }}">
-            <div class="form-group">
-                <label for="subtask-name-{{ item.id }}">Sub‑Task name:</label>
-                <input type="text" id="subtask-name-{{ item.id }}"
-                       name="subtask_name" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" name="sub_due_checkbox"
-                           class="due-checkbox"
-                           data-target="sub-due-container-{{ item.id }}">
-                    Due date:
-                </label>
-                <div id="sub-due-container-{{ item.id }}" style="display:none;">
-                    <input type="datetime-local" name="sub_due_date"
-                           class="form-control">
-                </div>
-            </div>
-            <button type="submit" class="btn">Add Sub‑Task</button>
-        </form>
-    </li>
-{% else %}
-    <li>No pending items.</li>
-{% endfor %}
-</ul>
+  {# ---- Scheduled Items ---------------------------------------------- #}
+  <h3>Scheduled Items</h3>
+  {% if scheduled %}
+    {% for item, status_class, due_display in scheduled %}
+      <div class="list-item">
+        <div class="flex-grow"><strong>{{ item.name }}</strong> – Due: {{ due_display }}</div>
+        <div class="task-controls">
+          <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
+            <input type="hidden" name="action" value="complete">
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn complete-btn">Complete</button>
+          </form>
+          <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
+            <input type="hidden" name="action" value="remove">
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn delete-btn">Remove</button>
+          </form>
+        </div>
+      </div>
 
-<h3>Scheduled Items</h3>
-<ul class="list-group">
-{% for item, status_class, due_display in scheduled %}
-    <li class="list-group-item {{ status_class }}">
-        <div class="item-header-row">
-            <div class="item-header">
-                <strong>{{ item.name }} – Due: {{ due_display }}</strong>
-            </div>
-            <div class="task-controls">
-                <form method="post"
-                      action="{{ url_for('main.todolist', list_id=todo_list.id) }}">
-                    <input type="hidden" name="action" value="complete">
-                    <input type="hidden" name="item_id" value="{{ item.id }}">
-                    <input type="hidden" name="csrf_token"
-                           value="{{ csrf_token() }}">
+      {% if item.subtasks %}
+        <div class="subtasks">
+          {% for sub in item.subtasks %}
+            <div class="subtask{% if sub.completed %} completed{% endif %}">
+              <div class="flex-grow">
+                <strong>{{ sub.name }}</strong>
+                {% if sub.due_date %}
+                  – Due: {{ sub.due_date.strftime('%Y-%m-%d %H:%M') }}
+                {% endif %}
+              </div>
+              <div class="task-controls">
+                {% if sub.completed %}
+                  <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
+                    <input type="hidden" name="action" value="undo_sub">
+                    <input type="hidden" name="subtask_id" value="{{ sub.id }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn">Undo</button>
+                  </form>
+                {% else %}
+                  <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
+                    <input type="hidden" name="action" value="complete_sub">
+                    <input type="hidden" name="subtask_id" value="{{ sub.id }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn complete-btn">Complete</button>
+                  </form>
+                {% endif %}
+                <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
+                  <input type="hidden" name="action" value="remove_sub">
+                  <input type="hidden" name="subtask_id" value="{{ sub.id }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn delete-btn">Remove</button>
                 </form>
-                <form method="post"
-                      action="{{ url_for('main.todolist', list_id=todo_list.id) }}">
-                    <input type="hidden" name="action" value="remove">
-                    <input type="hidden" name="item_id" value="{{ item.id }}">
-                    <input type="hidden" name="csrf_token"
-                           value="{{ csrf_token() }}">
-                    <button type="submit" class="btn delete-btn">Remove</button>
-                </form>
+              </div>
             </div>
+          {% endfor %}
         </div>
+      {% endif %}
 
-        {% if item.subtasks %}
-        <ul class="subtasks">
-            {% for sub in item.subtasks %}
-            <li class="subtask{% if sub.completed %} completed{% endif %}">
-                <div class="subtask-info">
-                    <span>{{ sub.name }}</span>
-                    {% if sub.due_date %}
-                    <span class="subtask-due">– Due: {{ sub.due_date.strftime('%Y-%m-%d %H:%M') }}</span>
-                    {% endif %}
-                    {% if sub.completed %}
-                    <span class="subtask-completed-note">Completed</span>
-                    {% endif %}
-                </div>
-                <div class="task-controls">
-                    {% if not sub.completed %}
-                    <form method="post"
-                          action="{{ url_for('main.todolist', list_id=todo_list.id) }}">
-                        <input type="hidden" name="action" value="complete_sub">
-                        <input type="hidden" name="subtask_id" value="{{ sub.id }}">
-                        <input type="hidden" name="csrf_token"
-                               value="{{ csrf_token() }}">
-                        <button type="submit" class="btn complete-btn">Complete</button>
-                    </form>
-                    {% endif %}
-                    <form method="post"
-                          action="{{ url_for('main.todolist', list_id=todo_list.id) }}">
-                        <input type="hidden" name="action" value="remove_sub">
-                        <input type="hidden" name="subtask_id" value="{{ sub.id }}">
-                        <input type="hidden" name="csrf_token"
-                               value="{{ csrf_token() }}">
-                        <button type="submit" class="btn delete-btn">Remove</button>
-                    </form>
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-
-        <!-- Sub‑task creation form – appears under the sub‑task list -->
-        <form method="post"
-              action="{{ url_for('main.todolist', list_id=todo_list.id) }}"
-              class="add-subtask-form">
-            <input type="hidden" name="action" value="add_sub">
-            <input type="hidden" name="parent_id" value="{{ item.id }}">
-            <input type="hidden" name="csrf_token"
-                   value="{{ csrf_token() }}">
-            <div class="form-group">
-                <label for="subtask-name-{{ item.id }}">Sub‑Task name:</label>
-                <input type="text" id="subtask-name-{{ item.id }}"
-                       name="subtask_name" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" name="sub_due_checkbox"
-                           class="due-checkbox"
-                           data-target="sub-due-container-{{ item.id }}">
-                    Due date:
-                </label>
-                <div id="sub-due-container-{{ item.id }}" style="display:none;">
-                    <input type="datetime-local" name="sub_due_date"
-                           class="form-control">
-                </div>
-            </div>
-            <button type="submit" class="btn">Add Sub‑Task</button>
-        </form>
-    </li>
-{% else %}
-    <li>No scheduled items.</li>
-{% endfor %}
-</ul>
-
-<h3>Completed Items</h3>
-<ul class="list-group">
-{% for item in completed %}
-    <!-- Add the completed‑task class so the whole row turns green -->
-    <li class="list-group-item completed-task">
-        <div class="item-header-row">
-            <div class="item-header">
-                <strong>{{ item.name }} – Completed at
-                        {{ item.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</strong>
-            </div>
-            <div class="task-controls">
-                <form method="post"
-                      action="{{ url_for('main.todolist', list_id=todo_list.id) }}">
-                    <input type="hidden" name="action" value="remove">
-                    <input type="hidden" name="item_id" value="{{ item.id }}">
-                    <input type="hidden" name="csrf_token"
-                           value="{{ csrf_token() }}">
-                    <button type="submit" class="btn delete-btn">Remove</button>
-                </form>
-            </div>
+      {# ---- Sub‑task form for this item ------------------------------- #}
+      <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}">
+        <input type="hidden" name="action" value="add_sub">
+        <input type="hidden" name="parent_id" value="{{ item.id }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+          <label for="subtask_name_{{ item.id }}">Sub‑Task name:</label>
+          <input type="text" id="subtask_name_{{ item.id }}" name="subtask_name" class="form-control" required>
         </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" name="sub_due_checkbox" class="due-checkbox" data-target="sub_due_container_{{ item.id }}">
+            Due date
+          </label>
+          <div id="sub_due_container_{{ item.id }}" style="display:none;">
+            <input type="datetime-local" name="sub_due_date" class="form-control">
+          </div>
+        </div>
+        <button type="submit" class="btn">Add Sub‑Task</button>
+      </form>
+      <hr>
+    {% endfor %}
+  {% else %}
+    <p>No scheduled items.</p>
+  {% endif %}
 
-        {% if item.subtasks %}
-        <ul class="subtasks">
-            {% for sub in item.subtasks %}
-            <li class="subtask{% if sub.completed %} completed{% endif %}">
-                <div class="subtask-info">
-                    <span>{{ sub.name }}</span>
-                    {% if sub.due_date %}
-                    <span class="subtask-due">– Due: {{ sub.due_date.strftime('%Y-%m-%d %H:%M') }}</span>
-                    {% endif %}
-                </div>
-                <div class="subtask-completed-note">
-                    Completed at {{ sub.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-    </li>
-{% else %}
-    <li>No completed items.</li>
-{% endfor %}
-</ul>
+  {# ---- Completed Items ---------------------------------------------- #}
+  <h3>Completed Items</h3>
+  {% if completed %}
+    {% for item in completed %}
+      <div class="list-item">
+        <div class="flex-grow"><strong>{{ item.name }}</strong> – Completed at {{ item.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+        <div class="task-controls">
+          <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
+            <input type="hidden" name="action" value="undo">
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn">Undo</button>
+          </form>
+          <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
+            <input type="hidden" name="action" value="remove">
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn delete-btn">Remove</button>
+          </form>
+        </div>
+      </div>
 
-<script src="{{ url_for('static', filename='js/todo.js') }}"></script>
+      {% if item.subtasks %}
+        <div class="subtasks">
+          {% for sub in item.subtasks if sub.completed %}
+            <div class="subtask completed">
+              <div class="flex-grow">
+                <strong>{{ sub.name }}</strong>
+                {% if sub.due_date %}
+                  – Due: {{ sub.due_date.strftime('%Y-%m-%d %H:%M') }}
+                {% endif %}
+                – Completed at {{ sub.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+              </div>
+              <div class="task-controls">
+                <form method="post" action="{{ url_for('main.todolist', list_id=todo_list.id) }}" style="display:inline;">
+                  <input type="hidden" name="action" value="remove_sub">
+                  <input type="hidden" name="subtask_id" value="{{ sub.id }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn delete-btn">Remove</button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    <p>No completed items.</p>
+  {% endif %}
+</div>
 {% endblock %}

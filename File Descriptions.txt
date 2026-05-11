@@ -146,17 +146,29 @@ app/routes/todo.py
   • No other modules are affected.
 
 --------------------------------------------------------------------
+app/static/css/monthly.css
+  •  CSS rules for the Monthly Overview page, used by monthly.html
+  
+
+--------------------------------------------------------------------
 app/static/css/style.css
-  • **New CSS rules** for sub‑task presentation:
-    – `.subtasks` – indented container.
-    – `.subtask` – flex container with padding, background,
-      border‑radius.
-    – `.subtask.completed` – green background to indicate
-      completion.
-    – `.subtask-due`, `.subtask-completed-note` – subtle styling for
-      due dates and completion timestamps.
-  • The existing theme variables, global layout, button styles,
-    forms, tables, and the To‑Do list section remain unchanged.
+  • General CSS rules for common elements, used by base.html
+  
+
+--------------------------------------------------------------------
+app/static/css/task_overview.css
+  •  CSS rules for the Monthly Overview page, used by task_overview.html
+  
+
+--------------------------------------------------------------------
+app/static/css/todo_list.css
+  •  CSS rules for the ToDo List pages, used by todolist.html
+  
+
+--------------------------------------------------------------------
+app/static/css/todo_list_manager.css
+  •  CSS rules for the ToDo List Manager page, used by lists.html
+  
 
 --------------------------------------------------------------------
 app/static/js/theme.js

@@ -184,3 +184,32 @@ footer { text-align: center; margin-top: 2rem; color: var(--border); font-size: 
     padding: 0.5rem;
     margin-top: 0.5rem;
 }
+
+/* Task‑Overview grid ------------------------------------------- */
+.grid-row { display: flex; }
+.grid-cell {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  margin: 1px;
+  box-sizing: border-box;
+}
+.grid-cell.green { background: var(--success); color: var(--bg); }
+.grid-cell.red   { background: var(--danger); color: var(--bg); }
+.grid-cell.blank { background: var(--bg); color: var(--text); }
+
+.grid-cell .date-month,
+.grid-cell .date-day {
+  position: absolute;
+  font-size: 1.1rem;
+}
+
+.grid-cell .date-slash{
+  position: absolute;
+  font-size: 1.6rem;
+}
+.grid-cell .date-month { top: 6px; left: 6px; }
+.grid-cell .date-slash { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.grid-cell .date-day  { bottom: 6px; right: 6px; }

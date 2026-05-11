@@ -218,6 +218,17 @@ app/templates/todo/lists.html
   • Allows creating a new list and deleting existing ones.
 
 --------------------------------------------------------------------
+app/templates/tasks/task_overview.html
+• Renders the Task‑Overview page – a yearly heat‑map for a single task.  
+  – Includes a drop‑down selector populated with the current user’s daily tasks; selecting a task reloads the page.  
+  – Builds a 26‑row × 14‑column grid where each cell shows the date in “MM/DD” format.  
+    • Green cells = task completed on that day.  
+    • Red cells = task existed but was not completed.  
+    • Blank cells = task did not exist on that day (before its start date or after its end date).  
+  – Uses the new CSS classes defined for the grid cells (`grid-cell`, `green`, `red`, `blank`).  
+• Unchanged by the sub‑task feature.
+
+--------------------------------------------------------------------
 app/templates/todo/todolist.html
   • Core UI for a single To‑Do list:
     – Header with the list name and back‑to‑lists link.

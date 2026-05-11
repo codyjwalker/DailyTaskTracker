@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Task Overview – {{ selected_task.name }}{% endblock %}
+{% block content %}
+<h1>Task Overview – {{ selected_task.name }}</h1>
+
+<form method="get" id="task-select-form">
+  <label for="task-select">Select Task:</label>
+  <select name="task" id="task-select" onchange="this.form.submit()">
+    {% for t in tasks %}
+      <option value="{{ t.id }}" {% if t.id == selected_task.id %}selected{% endif %}>{{ t.name }}</option>
+    {% endfor %}
+  </select>
+</form>
+
+<div class="task-grid" style="margin-top:1rem;">
+  {% for row in grid %}
+  <div class="grid-row">
+    {% for cell in row %}
+    <div class="grid-cell {{ cell.color }}">
+      <span class="date-month">{{ cell.month }}</span>
+      <span class="date-slash">/</span>
+      <span class="date-day">{{ cell.day }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
 # app/routes/tasks.py
-"""Routes for daily and monthly task views."""
-from datetime import date
+"""Routes for daily, monthly and Task‑Overview views."""
+from datetime import date, timedelta
+
 from flask import (
     render_template,
     redirect,
@@ -12,7 +13,7 @@ from flask_login import login_required, current_user
 
 from . import bp
 from .. import db
-from ..models import TaskList
+from ..models import TaskList, DailyTask
 from ..helpers import (
     get_monthly_view,
     get_daily_status,
@@ -51,7 +52,69 @@ def monthly():
         next_month=next_month_val,
     )
 
+# ------------------------------------------------------------------
+# NEW: Task‑Overview – yearly heat‑map style overview for a single task
+# ------------------------------------------------------------------
+@bp.route("/task")
+@login_required
+def task_overview():
+    """Render a yearly heat‑map style overview for a single task."""
+    # All tasks that belong to the current user
+    tasks = TaskList.query.filter_by(user_id=current_user.id).order_by(TaskList.position).all()
 
+    # Selected task (query‑string “task” contains the task ID)
+    task_id = request.args.get("task", type=int)
+    selected_task = None
+    if task_id:
+        selected_task = TaskList.query.filter_by(id=task_id, user_id=current_user.id).first()
+
+    if not selected_task and tasks:
+        selected_task = tasks[0]
+
+    if not selected_task:
+        flash("No tasks found.", "warning")
+        return redirect(url_for("main.monthly"))
+
+    today = date.today()
+    earliest_date = today - timedelta(days=363)   # 364 days including today
+
+    # Map of dates → completion status for the chosen task
+    daily_tasks = DailyTask.query.filter_by(
+        user_id=current_user.id, task_id=selected_task.id
+    ).filter(DailyTask.date >= earliest_date, DailyTask.date <= today).all()
+    status_map = {dt.date: dt.status for dt in daily_tasks}
+
+    rows, cols = 26, 14
+    grid = []
+    for r in range(rows):
+        row = []
+        for c in range(cols):
+            offset = r * cols + (cols - 1 - c)  # right‑to‑left mapping
+            cell_date = today - timedelta(days=offset)
+            exists = (
+                selected_task.start_date <= cell_date
+                and (selected_task.end_date is None or selected_task.end_date > cell_date)
+            )
+            if exists:
+                status = status_map.get(cell_date, False)
+                color = "green" if status else "red"
+            else:
+                color = "blank"
+            row.append({
+                "date": cell_date,
+                "color": color,
+                "exists": exists,
+                "month": f"{cell_date.month:02d}",
+                "day": f"{cell_date.day:02d}",
+            })
+        grid.append(row)
+
+    return render_template(
+        "tasks/task_overview.html",
+        selected_task=selected_task,
+        tasks=tasks,
+        grid=grid,
+    )
 @bp.route("/daily", methods=["GET", "POST"])
 @login_required
 def daily():

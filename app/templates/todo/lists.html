@@ -4,9 +4,6 @@
 {% block content %}
 <div class="container">
     <h1>To‑Do Lists</h1>
-    <p><a href="{{ url_for('main.monthly') }}">Back to Monthly Overview</a></p>
-
-    <h2>Existing Lists</h2>
     {% if todo_lists %}
         <ul class="list-unstyled">
         {% for lst in todo_lists %}

@@ -182,7 +182,7 @@ def todolist():
                     item.completed = True
                     item.timestamp = datetime.utcnow()
                     # also mark all subtasks completed
-                    for sub in item.subtasks.all():
+                    for sub in item.subtasks:
                         sub.completed = True
                         sub.timestamp = item.timestamp
                     db.session.commit()

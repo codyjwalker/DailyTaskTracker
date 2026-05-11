@@ -1,63 +1,63 @@
 /* app/static/css/style.css */
 
-/* Theme variables -------------------------------------------------------------- */
+/* Theme variables ----------------------------------------------- */
 :root { 
-  --bg: #ffffff; 
-  --text: #222222; 
-  --accent: #007bff; 
-  --danger: #dc3545; 
-  --success: #28a745; 
-  --warning: #ffc107; 
-  --border: #ced4da; 
-  --border-radius: 4px; 
-  --font-family: system-ui, sans-serif; 
+    --bg: #ffffff; 
+    --text: #222222; 
+    --accent: #007bff; 
+    --danger: #dc3545; 
+    --success: #28a745; 
+    --warning: #ffc107; 
+    --border: #ced4da; 
+    --border-radius: 4px; 
+    --font-family: system-ui, sans-serif; 
 } 
 
 html[data-theme="dark"] { 
-  --bg: #222222; 
-  --text: #f0f0f0; 
-  --accent: #90caf9; 
-  --danger: #f44336; 
-  --success: #4caf50; 
-  --warning: #ffeb3b; 
-  --border: #555555; 
+    --bg: #222222; 
+    --text: #f0f0f0; 
+    --accent: #90caf9; 
+    --danger: #f44336; 
+    --success: #4caf50; 
+    --warning: #ffeb3b; 
+    --border: #555555; 
 } 
 
-/* Global styles -------------------------------------------------------------- */
+/* Global styles ----------------------------------------------- */
 html, body { 
-  margin: 0; 
-  padding: 0; 
-  font-family: var(--font-family); 
-  background: var(--bg); 
-  color: var(--text); 
-  line-height: 1.5; 
+    margin: 0; 
+    padding: 0; 
+    font-family: var(--font-family); 
+    background: var(--bg); 
+    color: var(--text); 
+    line-height: 1.5; 
 } 
 *, *::before, *::after { box-sizing: border-box; } 
 
 a { color: var(--accent); text-decoration: none; } 
 a:hover { text-decoration: underline; } 
 
-/* Navigation -------------------------------------------------------------- */
+/* Navigation ----------------------------------------------- */
 .navbar { 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  padding: .75rem 1rem; 
-  background: var(--border); 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: .75rem 1rem; 
+    background: var(--border); 
 } 
 .nav-left a { margin-right: 1rem; } 
 .theme-toggle { 
-  background: none; 
-  border: none; 
-  font-size: 1.2rem; 
-  cursor: pointer; 
-  color: var(--text); 
+    background: none; 
+    border: none; 
+    font-size: 1.2rem; 
+    cursor: pointer; 
+    color: var(--text); 
 } 
 
-/* Container & layout ------------------------------------------------------- */
+/* Container & layout ------------------------------------------ */
 .container { max-width: 960px; margin: 0 auto; padding: 1rem; } 
 
-/* Flash messages ------------------------------------------------------------- */
+/* Flash messages ----------------------------------------------- */
 .flashes { margin-bottom: 1rem; } 
 .flash { padding: .75rem 1rem; margin-bottom: .5rem; border-radius: var(--border-radius); }
 .flash.success { background: var(--success); color: var(--bg); } 
@@ -65,132 +65,121 @@ a:hover { text-decoration: underline; }
 .flash.warning { background: var(--warning); color: var(--text); } 
 .flash.danger { background: var(--danger); color: var(--bg); } 
 
-/* Buttons -------------------------------------------------------------- */
+/* Buttons ------------------------------------------------------ */
 .btn { 
-  display: inline-block; 
-  padding: .5rem 1rem; 
-  border: none; 
-  border-radius: var(--border-radius); 
-  background: var(--accent); 
-  color: var(--bg); 
-  cursor: pointer; 
+    display: inline-block; 
+    min-width: 90px;          /* make every button the same width  */
+    width: auto;               /* allow a tiny button to shrink if
+                                  necessary (e.g. “Add”) */
+    padding: .5rem 1rem; 
+    border: none; 
+    border-radius: var(--border-radius); 
+    background: var(--accent); 
+    color: var(--bg); 
+    cursor: pointer; 
 } 
 .btn:hover { opacity: .9; } 
-.btn.delete-btn { background: var(--danger); } 
-.btn.complete-btn { background: var(--success); } 
-.btn.remove-btn { background: var(--warning); } 
 
-/* Forms -------------------------------------------------------------- */
+/* Keep the original colour‑only rules so “Complete” stays green
+   and “Remove” stays red. They appear after .btn so they override
+   the default background. */
+.btn.delete-btn   { background: var(--danger); }   /* red */
+.btn.complete-btn { background: var(--success); }  /* green */
+.btn.remove-btn  { background: var(--warning); }  /* orange – kept as
+                                                     in the original file */
+
+/* Forms -------------------------------------------------------- */
 form .form-group { margin-bottom: .75rem; } 
 form .form-control { 
-  width: 100%; 
-  padding: .5rem; 
-  border: 1px solid var(--border); 
-  border-radius: var(--border-radius); 
-  background: var(--bg); 
-  color: var(--text); 
+    width: 100%; 
+    padding: .5rem; 
+    border: 1px solid var(--border); 
+    border-radius: var(--border-radius); 
+    background: var(--bg); 
+    color: var(--text); 
 } 
 
-/* Monthly overview table ------------------------------------------------------- */
+/* Monthly overview table ---------------------------------------- */
 .monthly-table { width: 100%; border-collapse: collapse; } 
 .monthly-table th, .monthly-table td { 
-  border: 1px solid var(--border); 
-  padding: .4rem 0.6rem; 
-  text-align: center; 
-  font-size: 0.9rem; 
+    border: 1px solid var(--border); 
+    padding: .4rem 0.6rem; 
+    text-align: center; 
 } 
 .monthly-table th { background: var(--border); font-weight: normal; } 
 .monthly-table .status.done { color: var(--success); } 
 .monthly-table .status.not-done { color: var(--danger); } 
 
-/* Navigation arrows in month view ------------------------------------------ */
+/* Navigation arrows in month view ------------------------------ */
 .nav-arrows a { margin: 0 0.5rem; color: var(--accent); text-decoration: none; }
 .nav-arrows a:hover { text-decoration: underline; } 
 
-/* Footer -------------------------------------------------------------- */
-footer { text-align: center; margin-top: 2rem; color: var(--border); font-size: .875rem; }
+/* Footer -------------------------------------------------------- */
+footer { text-align: center; margin-top: 2rem; color: var(--border); font-size: .875rem; } 
 
-/* Todo List page styling ----------------------------------------------------- */
-.list-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
-}
-.list-item .btn {
-  margin-left: 0.5rem;
+/* To‑Do List page styling -------------------------------------- */
+.list-group { 
+    list-style: none; 
+    padding: 0; 
+    margin: 0; 
+} 
+.list-group-item { 
+    display: block;                     /* changed from flex to keep width  */
+    padding: .5rem .75rem; 
+    border: 1px solid var(--border); 
+    border-radius: var(--border-radius); 
+    margin-bottom: .5rem; 
+} 
+
+/* Helper that keeps the header + control buttons on one line */
+.item-header-row { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: .5rem; 
+    margin-right: .5rem; 
+} 
+
+/* Sub‑tasks styling -------------------------------------------- */
+.subtasks { 
+    margin-left: 1.5rem;                /* indent nested sub‑tasks */ 
+} 
+.subtask { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: .25rem .5rem; 
+    margin-bottom: .25rem; 
+    background: var(--border); 
+    border-radius: var(--border-radius); 
+    border: 1px solid var(--border);   /* border around each sub‑task */ 
+} 
+.subtask.completed { 
+    background: var(--success); 
+    color: var(--bg); 
+} 
+.subtask-due { 
+    margin-left: .5rem; 
+    font-size: .9rem; 
+    color: var(--warning); 
+} 
+.subtask-completed-note { 
+    margin-left: .5rem; 
+    font-size: .85rem; 
+    color: var(--text); 
+    opacity: .8; 
 }
 
-/* Task controls layout */
-.task-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-.task-section {
-  flex: 1 1 30%;
-  min-width: 200px;
-  background: var(--border);
-  padding: 1rem;
-  border-radius: var(--border-radius);
-}
-.task-section h3 {
-  margin-top: 0;
+/* Completed‑Task highlight ------------------------------------- */
+.completed-task {
+    background: var(--success);   /* green background for completed tasks */
+    color: var(--bg);             /* white text on green */
 }
 
-/* Lists page */
-.list-group {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.list-group-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: .5rem .75rem;
+/* Border around the sub‑task list when the parent task is completed */
+.completed-task .subtasks {
     border: 1px solid var(--border);
     border-radius: var(--border-radius);
-    margin-bottom: .5rem;
-}
-
-/* To‑Do List page styling */
-.list-item { 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  margin-bottom: 0.75rem; 
-}
-.list-item .btn { 
-  margin-left: 0.5rem; 
-}
-
-/* Sub‑tasks styling */
-.subtasks {
-    margin-left: 1.5rem;                /* indent nested sub‑tasks */
-}
-.subtask {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: .25rem .5rem;
-    margin-bottom: .25rem;
-    background: var(--border);
-    border-radius: var(--border-radius);
-}
-.subtask.completed {
-    background: var(--success);
-    color: var(--bg);
-}
-.subtask-due {
-    margin-left: .5rem;
-    font-size: .9rem;
-    color: var(--warning);
-}
-.subtask-completed-note {
-    margin-left: .5rem;
-    font-size: .85rem;
-    color: var(--text);
-    opacity: .8;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
 }

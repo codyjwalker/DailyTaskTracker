@@ -99,3 +99,6 @@ form .form-control {
     background: var(--bg); 
     color: var(--text); 
 } 
+
+/* Footer -------------------------------------------------------- */
+footer { text-align: center; margin-top: 2rem; color: var(--border); font-size: .875rem; } 

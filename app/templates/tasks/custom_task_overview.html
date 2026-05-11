@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Custom Task Overview{% endblock %}
+
+{% block content %}
+  <h2>Custom Task Overview</h2>
+
+  {# Task selector ------------------------------------------ #}
+  <div>
+    <form method="get" action="{{ url_for('main.custom_task_overview') }}">
+      <label for="task_id">Select Task:</label>
+      <select name="task_id" id="task_id" onchange="this.form.submit()">
+        {% for t in tasks %}
+          <option value="{{ t.id }}" {% if t.id == selected_task.id %}selected{% endif %}>{{ t.name }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </div>
+
+  {# Add a new custom task ----------------------------------- #}
+  <div style="margin-top:1rem;">
+    <form method="post" action="{{ url_for('main.add_custom_task') }}">
+      <input type="text" name="name" placeholder="New custom task name" required>
+      <button type="submit">Add Custom Task</button>
+    </form>
+  </div>
+
+  {# Status grid --------------------------------------------- #}
+  {% if grid %}
+    <style>
+      .task-cell {border:1px solid #ccc;padding:2px;text-align:center;width:30px;}
+      .completed {background-color:#c8e6c9;}
+      .not-completed {background-color:#ffcdd2;}
+    </style>
+    <table style="border-collapse:collapse;width:100%;margin-top:1rem;">
+      {% for day in grid %}
+        <tr>
+          <td class="task-cell {{ 'completed' if day.status else 'not-completed' if day.status is not none else '' }}">
+            {{ day.date }}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% endif %}
+{% endblock %}

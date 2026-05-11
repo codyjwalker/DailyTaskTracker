@@ -1,0 +1,42 @@
+/* app/static/css/monthly.css */
+
+/* ======================================================
+         Monthly Overview – Task Control Sections
+   ====================================================== */
+
+/* The container that holds the three sections */
+.task-controls {
+  display: flex;              /* horizontal layout */
+  flex-wrap: wrap;            /* wrap if the viewport is too narrow */
+  gap: 1.5rem;                /* space between sections */
+  margin-top: 1rem;           /* a little breathing room */
+}
+
+/* Individual section card */
+.task-section {
+  flex: 1 1 0;                /* equal share of the available width */
+  min-width: 260px;           /* prevent shrinking below readable width */
+  background: var(--border);  /* same subtle background as other cards */
+  padding: 1rem;              /* internal spacing */
+  border-radius: var(--border-radius);
+  box-sizing: border-box;     /* include padding in width calculation */
+}
+
+/* Section header */
+.task-section h3 {
+  margin: 0 0 .5rem 0;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+/* Reduce the margin between form groups – the same as .form-group in style.css */
+.task-section .form-group {
+  margin-bottom: .75rem;
+}
+
+/* The labels inside the section */
+.task-section label {
+  display: block;
+  margin-bottom: .25rem;
+  font-weight: bold;
+}

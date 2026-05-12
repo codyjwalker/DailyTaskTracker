@@ -5,3 +5,9 @@ services:
     restart: unless-stopped
     ports:
       - "5000:5000"
+    volumes:
+      # Persist the entire instance folder (which contains app.db)
+      - db-data:/app/instance
+
+volumes:
+  db-data:

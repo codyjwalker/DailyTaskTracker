@@ -31,13 +31,15 @@ DEFAULT_TASK_NAMES = [
     'Bed By Midnight',
 ]
 
+
 def init_user_task_list(user):
     """Create default TaskList entries for a new user."""
-    first_day = date.today().replace(day=1)          # <‑‑ new
+    first_day = date.today().replace(day=1)  # <‑‑ new
     for idx, name in enumerate(DEFAULT_TASK_NAMES, start=1):
         task = TaskList(user_id=user.id, name=name, position=idx, start_date=first_day)
         db.session.add(task)
     db.session.commit()
+
 
 def get_monthly_view(user, year, month):
     """Generate data for the monthly overview."""
@@ -90,11 +92,14 @@ def get_monthly_view(user, year, month):
                 "day": day,
                 "weekday": day_date.strftime("%a"),
                 "statuses": status_map,
+                # New flag to indicate future dates
+                "is_future": day_date > date.today(),
             }
         )
 
     task_names = [t.name for t in tasks]
     return days, task_names
+
 
 def get_daily_status(user, date_str):
     """Return status dict for a single date."""
@@ -111,6 +116,7 @@ def get_daily_status(user, date_str):
         task_name = TaskList.query.get(dt.task_id).name
         status_map[task_name] = dt.status
     return status_map
+
 
 def update_daily_status(user, date_str, statuses):
     """Persist daily status changes."""
@@ -129,4 +135,4 @@ def update_daily_status(user, date_str, statuses):
             db.session.add(dt)
         else:
             dt.status = done
-    db.session.commit()
+        db.session.commit()

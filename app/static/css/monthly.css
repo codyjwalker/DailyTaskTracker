@@ -55,3 +55,12 @@
   margin-bottom: .25rem;
   font-weight: bold;
 }
+/* Add background colors to status cells */
+.monthly-table .status.done {
+    background: var(--success);   /* green background */
+    color: var(--text);          /* make the ✔ icon visible */
+}
+.monthly-table .status.not-done {
+    background: var(--danger);   /* red background */
+    color: var(--text);          /* make the ✖ icon visible */
+}

@@ -19,8 +19,8 @@ git clone <repo-url>
 cd personal-task-tracker
 
 # Optional: create a virtual environment
-python -m venv venv
-source venv/bin/activate   # Windows: venv\Scripts\activate
+python -m venv .venv
+source .venv/bin/activate   # Windows: venv\Scripts\activate
 
 # Install deps
 pip install -r requirements.txt

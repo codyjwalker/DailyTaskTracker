@@ -29,7 +29,7 @@ pip install -r requirements.txt
 echo 'YOUR_RANDOM_KEY' > secret_key.txt
 
 # Run locally
-python run.py
+python3 run.py
 
 ```
 

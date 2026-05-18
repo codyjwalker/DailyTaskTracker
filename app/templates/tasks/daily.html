@@ -37,8 +37,15 @@
             {% endfor %}
         </tbody>
     </table>
-    <button type="submit">Save</button>
-</form>
+<script>
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+</script>
+
+    </form>
 
 <p><a href="{{ url_for('main.monthly') }}">Back to Monthly Overview</a></p>
 

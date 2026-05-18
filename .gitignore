@@ -6,3 +6,6 @@ __pycache__/
 *.pyc
 secret_key.txt
 OLDinstance/
+.claude/
+.coverage
+.venv/

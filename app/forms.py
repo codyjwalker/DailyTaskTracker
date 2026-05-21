@@ -10,7 +10,7 @@ class RegistrationForm(FlaskForm):
     """User registration form."""
     username = StringField(
         'Username',
-        validators=[DataRequired(), Length(min=3, max=150)]
+        validators=[Length(min=3, max=150, message='Please use at least 3 characters')]
     )
     password = PasswordField(
         'Password',
